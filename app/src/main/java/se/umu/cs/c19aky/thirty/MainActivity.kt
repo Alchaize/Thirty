@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Spinner
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 
@@ -22,15 +21,9 @@ class MainActivity : AppCompatActivity() {
 
         val throwButton : Button = findViewById(R.id.btn_throw)
         val categorySpinner : Spinner = findViewById(R.id.spinner_categories)
+        val diceButtons = getDiceButtons()
 
-        val diceButtons = mutableListOf<ImageButton>()
-        diceButtons.add(findViewById(R.id.die_one))
-        diceButtons.add(findViewById(R.id.die_two))
-        diceButtons.add(findViewById(R.id.die_three))
-        diceButtons.add(findViewById(R.id.die_four))
-        diceButtons.add(findViewById(R.id.die_five))
-        diceButtons.add(findViewById(R.id.die_six))
-
+        // On click listeners for dice
         for (imgButton in diceButtons) {
             imgButton.setOnClickListener {
                 val index = diceButtons.indexOf(imgButton)
@@ -39,9 +32,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // On click listener for throw button
         throwButton.setOnClickListener {
-            diceViewModel.throwDice()
-            updateDiceButtonImages(diceButtons, diceViewModel)
+            if (diceViewModel.getThrowsLeft() > 0) {
+                diceViewModel.throwDice()
+                updateDiceButtonImages(diceButtons, diceViewModel)
+            } else {
+                Log.d(TAG, "Yo this shit kinda cringe dawg")
+            }
         }
 
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -89,5 +87,16 @@ class MainActivity : AppCompatActivity() {
             }
             button.setImageResource(image)
         }
+    }
+
+    private fun getDiceButtons(): MutableList<ImageButton> {
+        val diceButtons = mutableListOf<ImageButton>()
+        diceButtons.add(findViewById(R.id.die_one))
+        diceButtons.add(findViewById(R.id.die_two))
+        diceButtons.add(findViewById(R.id.die_three))
+        diceButtons.add(findViewById(R.id.die_four))
+        diceButtons.add(findViewById(R.id.die_five))
+        diceButtons.add(findViewById(R.id.die_six))
+        return diceButtons
     }
 }
