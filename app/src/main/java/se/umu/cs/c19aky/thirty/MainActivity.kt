@@ -54,6 +54,9 @@ class MainActivity : AppCompatActivity() {
             categorySpinner.adapter = adapter
         }
 
+        diceViewModel.throwDice()
+        diceViewModel.resetThrows()
+        updateDiceButtonImages(diceButtons, diceViewModel)
     }
 
     private fun updateDiceButtonImages(diceButtons : MutableList<ImageButton>, diceViewModel : DiceViewModel) {
