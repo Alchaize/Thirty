@@ -3,10 +3,7 @@ package se.umu.cs.c19aky.thirty
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.Spinner
+import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 
 private const val TAG = "MainActivity"
@@ -21,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         val throwButton : Button = findViewById(R.id.btn_throw)
         val categorySpinner : Spinner = findViewById(R.id.spinner_categories)
+        val throwCountText : TextView = findViewById(R.id.tv_throws_left)
         val diceButtons = getDiceButtons()
 
         // On click listeners for dice
@@ -34,11 +32,14 @@ class MainActivity : AppCompatActivity() {
 
         // On click listener for throw button
         throwButton.setOnClickListener {
-            if (diceViewModel.getThrowsLeft() > 0) {
+            val throwsLeft = diceViewModel.getThrowsLeft()
+            if (throwsLeft > 0) {
                 diceViewModel.throwDice()
                 updateDiceButtonImages(diceButtons, diceViewModel)
+                updateThrowsLeft(throwCountText, throwsLeft-1)
             } else {
                 Log.d(TAG, "Yo this shit kinda cringe dawg")
+                updateThrowsLeft(throwCountText, throwsLeft)
             }
         }
 
@@ -101,5 +102,13 @@ class MainActivity : AppCompatActivity() {
         diceButtons.add(findViewById(R.id.die_five))
         diceButtons.add(findViewById(R.id.die_six))
         return diceButtons
+    }
+
+    private fun updateThrowsLeft(textView: TextView, throwsLeft: Int) {
+        when(throwsLeft) {
+            2 -> textView.setText(R.string.tv_throws_left_2)
+            1 -> textView.setText(R.string.tv_throws_left_1)
+            else -> textView.setText(R.string.tv_throws_left_0)
+        }
     }
 }
