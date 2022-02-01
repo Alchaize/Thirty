@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
                 updateDiceButtonImages(diceButtons, diceViewModel)
                 updateThrowsLeft(throwCountText, throwsLeft-1)
             } else {
-                Log.d(TAG, "Yo this shit kinda cringe dawg")
                 updateThrowsLeft(throwCountText, throwsLeft)
             }
         }
