@@ -55,17 +55,20 @@ class MainActivity : AppCompatActivity() {
             categorySpinner.adapter = adapter
         }
 
+        // Throw the dice once before the user gets to interact, to make sure the dice are randomized
         diceViewModel.throwDice()
         diceViewModel.resetThrows()
         updateDiceButtonImages(diceButtons, diceViewModel)
     }
 
+    // Update the images on all of the dice
     private fun updateDiceButtonImages(diceButtons : MutableList<ImageButton>, diceViewModel : DiceViewModel) {
         for (button in diceButtons) {
             updateButtonImage(button, diceButtons.indexOf(button), diceViewModel)
         }
     }
 
+    // Update the image of a die
     private fun updateButtonImage(button : ImageButton, index : Int, diceViewModel: DiceViewModel) {
 
         if (!diceViewModel.getDieLocked(index)) {
@@ -93,6 +96,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Get the dice buttons
     private fun getDiceButtons(): MutableList<ImageButton> {
         val diceButtons = mutableListOf<ImageButton>()
         diceButtons.add(findViewById(R.id.die_one))
@@ -104,6 +108,7 @@ class MainActivity : AppCompatActivity() {
         return diceButtons
     }
 
+    // Update the text showing how many throws are left
     private fun updateThrowsLeft(textView: TextView, throwsLeft: Int) {
         when(throwsLeft) {
             2 -> textView.setText(R.string.tv_throws_left_2)
