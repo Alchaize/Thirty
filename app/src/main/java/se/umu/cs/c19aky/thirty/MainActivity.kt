@@ -15,7 +15,6 @@ const val EXTRA_DICE_VALUES = "se.umu.cs.c19aky.thirty.dice_values"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var throwButton: Button
-    private lateinit var categorySpinner: Spinner
     private lateinit var throwCountText: TextView
     private lateinit var diceViewModel : DiceViewModel
 
@@ -38,7 +37,6 @@ class MainActivity : AppCompatActivity() {
         diceViewModel = ViewModelProvider(this).get(DiceViewModel::class.java)
 
         throwButton = findViewById(R.id.btn_throw)
-        categorySpinner = findViewById(R.id.spinner_categories)
         throwCountText = findViewById(R.id.tv_throws_left)
 
         val diceButtons = getDiceButtons()
@@ -70,18 +68,6 @@ class MainActivity : AppCompatActivity() {
                     updateDiceButtonImages(diceButtons, diceViewModel)
                     updateThrowsLeft(throwCountText, throwsLeft-1)}
             }
-        }
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.categories_array,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            categorySpinner.adapter = adapter
         }
 
         // Throw the dice once before the user gets to interact, to make sure the dice are randomized

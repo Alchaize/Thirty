@@ -68,15 +68,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Spinner
-            android:id="@+id/spinner_categories"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginBottom="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <TextView
             android:id="@+id/tv_throws_left"
             android:layout_width="wrap_content"
@@ -84,8 +75,7 @@
             android:layout_marginBottom="40dp"
             android:text="@string/tv_throws_left_2"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_throw"
-            app:layout_constraintStart_toEndOf="@+id/spinner_categories" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_throw" />
 
         <Button
             android:id="@+id/btn_throw"

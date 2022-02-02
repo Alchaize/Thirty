@@ -5,7 +5,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.Spinner
 
 private const val TAG = "PointCount"
 
@@ -13,6 +15,7 @@ class PointCount : AppCompatActivity() {
 
     private lateinit var diceButtons: MutableList<ImageButton>
     private lateinit var diceViewModel : DiceViewModel
+    private lateinit var categorySpinner: Spinner
 
     private fun returnResult(pointSum: Int) {
         val data = Intent()
@@ -28,6 +31,7 @@ class PointCount : AppCompatActivity() {
         val diceValues = intent.getIntegerArrayListExtra(EXTRA_DICE_VALUES)
         diceViewModel = DiceViewModel()
         diceButtons = getDiceButtons()
+        categorySpinner = findViewById(R.id.spinner_categories)
 
         if (diceValues != null) {
             for (value in diceValues) {
@@ -44,6 +48,18 @@ class PointCount : AppCompatActivity() {
                 updateButtonImage(imgButton, diceButtons.indexOf(imgButton), diceViewModel)
             }
             updateButtonImage(imgButton, diceButtons.indexOf(imgButton), diceViewModel)
+        }
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.categories_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            categorySpinner.adapter = adapter
         }
     }
 
