@@ -1,24 +1,46 @@
 package se.umu.cs.c19aky.thirty
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 
 private const val TAG = "MainActivity"
+const val EXTRA_DICE_VALUES = "se.umu.cs.c19aky.thirty.dice_values"
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var throwButton: Button
+    private lateinit var categorySpinner: Spinner
+    private lateinit var throwCountText: TextView
+    private lateinit var diceViewModel : DiceViewModel
+
+    private val startCountPointsForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val i = it.data
+                if (i != null) {
+                    val points = i.getIntExtra(PointCount.EXTRA_POINT_SUM, 0)
+                    diceViewModel.addPoints(points)
+                }
+            }
+        }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val diceViewModel : DiceViewModel = ViewModelProvider(this).get(DiceViewModel::class.java)
+        diceViewModel = ViewModelProvider(this).get(DiceViewModel::class.java)
 
-        val throwButton : Button = findViewById(R.id.btn_throw)
-        val categorySpinner : Spinner = findViewById(R.id.spinner_categories)
-        val throwCountText : TextView = findViewById(R.id.tv_throws_left)
+        throwButton = findViewById(R.id.btn_throw)
+        categorySpinner = findViewById(R.id.spinner_categories)
+        throwCountText = findViewById(R.id.tv_throws_left)
+
         val diceButtons = getDiceButtons()
 
         // On click listeners for dice
@@ -32,13 +54,21 @@ class MainActivity : AppCompatActivity() {
 
         // On click listener for throw button
         throwButton.setOnClickListener {
-            val throwsLeft = diceViewModel.getThrowsLeft()
-            if (throwsLeft > 0) {
-                diceViewModel.throwDice()
-                updateDiceButtonImages(diceButtons, diceViewModel)
-                updateThrowsLeft(throwCountText, throwsLeft-1)
-            } else {
-                updateThrowsLeft(throwCountText, throwsLeft)
+
+            when (val throwsLeft = diceViewModel.getThrowsLeft()) {
+                0 -> {startCountPointsForResult.launch(Intent(this, PointCount::class.java).apply {
+                    putExtra(EXTRA_DICE_VALUES, diceViewModel.getDiceValues())
+                })
+                diceViewModel.resetThrows()}
+
+                1 -> {diceViewModel.throwDice()
+                    updateDiceButtonImages(diceButtons, diceViewModel)
+                    updateThrowsLeft(throwCountText, 0)
+                    throwButton.setText(R.string.btn_continue)}
+
+                else -> {diceViewModel.throwDice()
+                    updateDiceButtonImages(diceButtons, diceViewModel)
+                    updateThrowsLeft(throwCountText, throwsLeft-1)}
             }
         }
 

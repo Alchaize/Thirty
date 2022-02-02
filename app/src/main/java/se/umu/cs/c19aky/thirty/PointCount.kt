@@ -8,4 +8,10 @@ class PointCount : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_point_count)
     }
+
+
+
+    companion object {
+        const val EXTRA_POINT_SUM = "se.umu.cs.c19aky.thirty.point_sum"
+    }
 }

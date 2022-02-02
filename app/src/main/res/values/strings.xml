@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Thirty</string>
     <string name="btn_throw">Throw</string>
+    <string name="btn_continue">Continue</string>
 
     <string name="tv_throws_left_2">Throws left: 2</string>
     <string name="tv_throws_left_1">Throws left: 1</string>
