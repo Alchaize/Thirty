@@ -41,7 +41,7 @@ class DiceViewModel : ViewModel() {
     }
 
     fun getDiceValues(): Array<Int> {
-        var diceValues = mutableListOf<Int>()
+        val diceValues = mutableListOf<Int>()
         for (die in diceList) {
             diceValues.add(die.value)
         }
