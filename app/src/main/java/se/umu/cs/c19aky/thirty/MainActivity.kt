@@ -10,7 +10,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 
 private const val TAG = "MainActivity"
+
 const val EXTRA_DICE_VALUES = "se.umu.cs.c19aky.thirty.dice_values"
+
+private const val STATE_THROWS = "throwsLeft"
+private const val STATE_DICE_VALUES = "diceValues"
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +32,20 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE_THROWS, diceViewModel.getThrowsLeft())
+        outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        Log.d(TAG, "Is this even happening?")
+        diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
+        diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +89,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Throw the dice once before the user gets to interact, to make sure the dice are randomized
-        diceViewModel.throwDice()
-        diceViewModel.resetThrows()
-        updateDiceButtonImages(diceButtons, diceViewModel)
+        if (diceViewModel.getThrowsLeft() == 2) {
+            diceViewModel.throwDice()
+            diceViewModel.resetThrows()
+            updateDiceButtonImages(diceButtons, diceViewModel)
+        }
     }
 
     // Update the images on all of the dice

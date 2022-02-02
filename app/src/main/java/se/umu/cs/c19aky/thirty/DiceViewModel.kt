@@ -23,6 +23,10 @@ class DiceViewModel : ViewModel() {
         return throwsLeft
     }
 
+    fun setThrowsLeft(throwCount: Int) {
+        throwsLeft = throwCount
+    }
+
     fun resetThrows() {
         throwsLeft = MAX_THROWS
     }
