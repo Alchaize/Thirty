@@ -76,11 +76,11 @@ class PointCount : AppCompatActivity() {
             val sum = if (selectedCategory == "Low") {
                 pointCalculator.calculatePointsLow(diceViewModel.getDiceValues())
             } else {
-                pointCalculator.calculatePoints(selectedCategory as Int, diceViewModel.getLockedDiceValues())
+                pointCalculator.calculatePoints((selectedCategory as String).toInt(), diceViewModel.getLockedDiceValues())
             }
 
             if (sum >= 0) {
-                Log.d(TAG, "Returning $sum")
+                Log.d(TAG, "Returning $sum, chosen category $selectedCategory")
                 returnResult(sum)
             } else {
                 // Tell user that they need to redo their selection of dice
