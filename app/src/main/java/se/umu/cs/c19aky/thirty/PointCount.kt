@@ -2,7 +2,6 @@ package se.umu.cs.c19aky.thirty
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Point
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -84,6 +83,7 @@ class PointCount : AppCompatActivity() {
                 returnResult(sum)
             } else {
                 // Tell user that they need to redo their selection of dice
+                // Not an issue until categories are saved.
                 TODO()
             }
         }
