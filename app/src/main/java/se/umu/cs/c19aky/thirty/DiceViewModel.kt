@@ -47,13 +47,21 @@ class DiceViewModel : ViewModel() {
     }
 
     fun getDiceValues(): ArrayList<Int> {
-        val diceValues = mutableListOf<Int>()
-        var diceValuesTwo = ArrayList<Int>()
+        val diceValues = ArrayList<Int>()
         for (die in diceList) {
             diceValues.add(die.value)
-            diceValuesTwo.add(die.value)
         }
-        return diceValuesTwo
+        return diceValues
+    }
+
+    fun getLockedDiceValues(): ArrayList<Int> {
+        val lockedDiceValues = ArrayList<Int>()
+        for (die in diceList) {
+            if (die.locked) {
+                lockedDiceValues.add(die.value)
+            }
+        }
+        return lockedDiceValues
     }
 
     fun getDieLocked(index : Int) : Boolean {

@@ -2,10 +2,12 @@ package se.umu.cs.c19aky.thirty
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Point
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Spinner
 
@@ -16,6 +18,8 @@ class PointCount : AppCompatActivity() {
     private lateinit var diceButtons: MutableList<ImageButton>
     private lateinit var diceViewModel : DiceViewModel
     private lateinit var categorySpinner: Spinner
+    private lateinit var pointCalculator: PointCalculator
+    private lateinit var buttonDone: Button
 
     private fun returnResult(pointSum: Int) {
         val data = Intent()
@@ -32,6 +36,8 @@ class PointCount : AppCompatActivity() {
         diceViewModel = DiceViewModel()
         diceButtons = getDiceButtons()
         categorySpinner = findViewById(R.id.spinner_categories)
+        pointCalculator = PointCalculator()
+        buttonDone = findViewById(R.id.btn_done)
 
         if (diceValues != null) {
             for (value in diceValues) {
@@ -61,6 +67,27 @@ class PointCount : AppCompatActivity() {
             // Apply the adapter to the spinner
             categorySpinner.adapter = adapter
         }
+
+        categorySpinner.setSelection(0)
+
+        buttonDone.setOnClickListener {
+            val selectedCategory = categorySpinner.selectedItem
+
+            val sum = if (selectedCategory == "Low") {
+                pointCalculator.calculatePointsLow(diceViewModel.getDiceValues())
+            } else {
+                pointCalculator.calculatePoints(selectedCategory as Int, diceViewModel.getLockedDiceValues())
+            }
+
+            if (sum >= 0) {
+                Log.d(TAG, "Returning $sum")
+                returnResult(sum)
+            } else {
+                // Tell user that they need to redo their selection of dice
+                TODO()
+            }
+        }
+
     }
 
 
