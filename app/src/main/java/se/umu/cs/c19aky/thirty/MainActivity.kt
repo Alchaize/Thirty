@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
             when (val throwsLeft = diceViewModel.getThrowsLeft()) {
                 0 -> {startCountPointsForResult.launch(Intent(this, PointCount::class.java).apply {
-                    putExtra(EXTRA_DICE_VALUES, diceViewModel.getDiceValues())
+                    putIntegerArrayListExtra(EXTRA_DICE_VALUES, diceViewModel.getDiceValues())
                 })
                 diceViewModel.resetThrows()}
 

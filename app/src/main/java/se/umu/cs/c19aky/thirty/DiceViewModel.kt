@@ -36,16 +36,24 @@ class DiceViewModel : ViewModel() {
         throwsLeft -= 1
     }
 
+    fun setDiceValues(diceValues: ArrayList<Int>) {
+        for (i in diceList.indices) {
+            diceList[i].value = diceValues[i]
+        }
+    }
+
     fun getDieValue(index : Int): Int {
         return diceList[index].value
     }
 
-    fun getDiceValues(): Array<Int> {
+    fun getDiceValues(): ArrayList<Int> {
         val diceValues = mutableListOf<Int>()
+        var diceValuesTwo = ArrayList<Int>()
         for (die in diceList) {
             diceValues.add(die.value)
+            diceValuesTwo.add(die.value)
         }
-        return diceValues.toTypedArray()
+        return diceValuesTwo
     }
 
     fun getDieLocked(index : Int) : Boolean {
