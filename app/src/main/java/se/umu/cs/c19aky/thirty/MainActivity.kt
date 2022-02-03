@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var throwButton: Button
     private lateinit var throwCountText: TextView
     private lateinit var diceViewModel : DiceViewModel
+    private lateinit var diceButtons: MutableList<ImageButton>
 
     private val startCountPointsForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
@@ -30,21 +31,17 @@ class MainActivity : AppCompatActivity() {
                     val points = i.getIntExtra(PointCount.EXTRA_POINT_SUM, 0)
                     diceViewModel.addPoints(points)
                 }
+            } else {
+                diceViewModel.setThrowsLeft(0)
+                updateThrowsLeft(throwCountText, 0)
             }
         }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(TAG, "Saving instance")
         outState.putInt(STATE_THROWS, diceViewModel.getThrowsLeft())
         outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        Log.d(TAG, "Is this even happening?")
-        diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
-        diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
     }
 
 
@@ -57,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         throwButton = findViewById(R.id.btn_throw)
         throwCountText = findViewById(R.id.tv_throws_left)
 
-        val diceButtons = getDiceButtons()
+        diceButtons = getDiceButtons()
 
         // On click listeners for dice
         for (imgButton in diceButtons) {
@@ -89,7 +86,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Throw the dice once before the user gets to interact, to make sure the dice are randomized
-        if (diceViewModel.getThrowsLeft() == 2) {
+        if (savedInstanceState != null) {
+            diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
+            diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
+            updateThrowsLeft(throwCountText, diceViewModel.getThrowsLeft())
+            updateDiceButtonImages(diceButtons, diceViewModel)
+        } else {
             diceViewModel.throwDice()
             diceViewModel.resetThrows()
             updateDiceButtonImages(diceButtons, diceViewModel)
