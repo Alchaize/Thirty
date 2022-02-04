@@ -9,7 +9,6 @@ private const val MAX_THROWS = 2
 class DiceViewModel : ViewModel() {
 
     private var throwsLeft = MAX_THROWS
-    private var pointSum = 0
     private val diceList = listOf(
         Die(1, false),
         Die( 1, false),
@@ -58,6 +57,12 @@ class DiceViewModel : ViewModel() {
         return diceValues
     }
 
+    fun clearLockedDice() {
+        for (die in diceList) {
+            die.locked = false
+        }
+    }
+
     fun getLockedDiceValues(): ArrayList<Int> {
         val lockedDiceValues = ArrayList<Int>()
         for (die in diceList) {
@@ -74,13 +79,5 @@ class DiceViewModel : ViewModel() {
 
     fun setDieLocked(index: Int, locked : Boolean) {
         diceList[index].locked = locked
-    }
-
-    fun addPoints(points: Int) {
-        pointSum += points
-    }
-
-    fun getPoints(): Int {
-        return pointSum
     }
 }
