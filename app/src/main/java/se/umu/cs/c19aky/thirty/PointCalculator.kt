@@ -1,6 +1,7 @@
 package se.umu.cs.c19aky.thirty
 
 import android.os.Bundle
+import android.util.Log
 
 private const val TAG = "PointCalculator"
 
@@ -17,12 +18,15 @@ class PointCalculator {
         }
     }
 
+    // Store categories, for restoring when able to
     fun storeCategories(outState: Bundle) {
+        Log.d(TAG, categories.values.toString())
         val toSave: ArrayList<Int> = arrayListOf()
         toSave.addAll(categories.values)
         outState.putIntegerArrayList(KEY_POINTS, toSave)
     }
 
+    // Restore categories
     fun restoreCategories(outState: Bundle) {
         val savedCategories: ArrayList<Int> = outState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
         categories["Low"] = savedCategories[0]
@@ -31,12 +35,13 @@ class PointCalculator {
         }
     }
 
+    // Check if a given cateogory is chosen
+    fun checkIfCategoryIsChosen(category: String): Boolean {
+        return categories[category] != -1
+    }
+
     // Calculate points
     fun calculatePoints(targetSum: Int, values: ArrayList<Int>): Int {
-        if (categories[targetSum.toString()] != -1) {
-            return -1
-        }
-
         var sum = 0
         for (value in values) {
             sum += value
@@ -50,10 +55,6 @@ class PointCalculator {
 
     // Sum all values from 0 to 3
     fun calculatePointsLow(values: ArrayList<Int>): Int {
-        if (categories["Low"] != -1) {
-            return -1
-        }
-
         var sum = 0
         for (value in values) {
             sum += if (value <= 3) {
@@ -72,5 +73,13 @@ class PointCalculator {
 
     fun getPoints(category: String): Int? {
         return categories[category]
+    }
+
+    fun getAllPoints(): ArrayList<Int> {
+        return ArrayList(categories.values)
+    }
+
+    fun getAllCategories(): ArrayList<String> {
+        return ArrayList(categories.keys)
     }
 }

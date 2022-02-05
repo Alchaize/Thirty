@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_CATEGORIES
+import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
 
 private const val TAG = "MainActivity"
 
@@ -15,6 +17,8 @@ private const val STATE_THROWS = "throwsLeft"
 private const val STATE_DICE_VALUES = "diceValues"
 private const val STATE_COUNT_STATE = "countState"
 private const val STATE_ROUND_COUNTER = "currentRound"
+
+private const val MAX_ROUNDS = 2
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +32,14 @@ class MainActivity : AppCompatActivity() {
 
     private var countState: Boolean = false
 
+    private val startCountPointsForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            currentRound = 1
+        }
+    }
+
+    // Save instance
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d(TAG, "Saving instance")
         outState.putInt(STATE_ROUND_COUNTER, currentRound)
@@ -37,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         pointCalculator.storeCategories(outState)
         super.onSaveInstanceState(outState)
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +75,9 @@ class MainActivity : AppCompatActivity() {
 
             when (val throwsLeft = diceViewModel.getThrowsLeft()) {
 
-                0 -> {tryGettingPoints()}
+                0 -> {if(tryGettingPoints()) {
+                    startNewRound()
+                }}
 
                 1 -> {countState = true
                     diceViewModel.throwDice()
@@ -90,9 +103,12 @@ class MainActivity : AppCompatActivity() {
             categorySpinner.adapter = adapter
         }
 
+        // Select the first item in the spinner
         categorySpinner.setSelection(0)
 
+        // If instance has been saved, restore that data
         if (savedInstanceState != null) {
+            Log.d(TAG, "Restoring instance")
             currentRound = savedInstanceState.getInt(STATE_ROUND_COUNTER)
             diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
             diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
@@ -104,25 +120,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun tryGettingPoints() {
+    // Try to get points using the currently selected spinner and dice
+    private fun tryGettingPoints(): Boolean {
         val selectedCategory: String = categorySpinner.selectedItem as String
 
-        val sum = if (selectedCategory == "Low") {
-            pointCalculator.calculatePointsLow(diceViewModel.getDiceValues())
+        // Check if category is already used
+        if (!pointCalculator.checkIfCategoryIsChosen(selectedCategory)) {
+
+            // Use the appropriate way to calculate the sum to store
+            val sum = if (selectedCategory == "Low") {
+                pointCalculator.calculatePointsLow(diceViewModel.getDiceValues())
+            } else {
+                pointCalculator.calculatePoints((selectedCategory).toInt(), diceViewModel.getLockedDiceValues())
+            }
+
+            // Make sure that the selected dice works for the current category before storing
+            return checkSelection(sum, selectedCategory)
+
         } else {
-            pointCalculator.calculatePoints((selectedCategory).toInt(), diceViewModel.getLockedDiceValues())
+            val toast = Toast.makeText(this, resources.getString(R.string.tt_category_already_chosen), Toast.LENGTH_SHORT)
+            toast.show()
+            return false
         }
 
-        if (sum >= 0) {
-            Log.d(TAG, "Returning $sum, chosen category $selectedCategory")
-            pointCalculator.addPoints(sum, selectedCategory)
-            startNewRound()
+    }
+
+    // Make sure that only valid dice selections are stored.
+    private fun checkSelection(sum: Int, category: String): Boolean {
+        return if (sum >= 0) {
+            pointCalculator.addPoints(sum, category)
+            true
         } else {
-            Log.d(TAG, "Category already chosen, please choose a different one")
+            val toast = Toast.makeText(this, resources.getString(R.string.tt_invalid_selection), Toast.LENGTH_SHORT)
+            toast.show()
+            false
         }
     }
 
+    // Start a new round
     private fun startNewRound() {
+        if (currentRound == MAX_ROUNDS) {
+            Log.d(TAG, "Game completed, now it's time to show the player the result.")
+            startCountPointsForResult.launch(Intent(this, GameResults::class.java).apply {
+                    putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
+                    putStringArrayListExtra(EXTRA_CATEGORIES, pointCalculator.getAllCategories())
+                })
+        }
         currentRound += 1
         countState = false
         diceViewModel.clearLockedDice()
@@ -156,6 +199,7 @@ class MainActivity : AppCompatActivity() {
             button.setImageResource(image)
         } else {
 
+            // Use different dice depending on which state the player is in
             val image = if (countState) {
                 when(diceViewModel.getDieValue(index)) {
                     1 -> R.drawable.red1
@@ -202,31 +246,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-// Saving this here to use later when I have to display all the categories and their points
-//                 0 -> {startCountPointsForResult.launch(Intent(this, PointCount::class.java).apply {
-//                    putIntegerArrayListExtra(EXTRA_DICE_VALUES, diceViewModel.getDiceValues())
-//                })
-/*
-
-private fun returnResult(pointSum: Int) {
-    val data = Intent()
-    data.putExtra(EXTRA_POINT_SUM, pointSum)
-    setResult(Activity.RESULT_OK, data)
-    finish()
-}
-
-private val startCountPointsForResult = registerForActivityResult(
-    ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            val i = it.data
-            if (i != null) {
-                val points = i.getIntExtra(PointCount.EXTRA_POINT_SUM, 0)
-                diceViewModel.addPoints(points)
-            }
-        } else {
-            diceViewModel.setThrowsLeft(0)
-            updateThrowsLeft(throwCountText, 0)
-        }
-    }
-*/
