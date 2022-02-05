@@ -7,13 +7,13 @@ private const val TAG = "PointCalculator"
 
 private const val KEY_POINTS = "se.umu.cs.c19aky.categories"
 
-class PointCalculator {
+class PointCalculator(numberOfCategories: Int = 9) {
 
     private var categories: MutableMap<String, Int> = mutableMapOf()
 
     init {
         categories["Low"] = -1
-        for (x in 4..12) {
+        for (x in 4 until numberOfCategories + 4) {
             categories[x.toString()] = -1
         }
     }
@@ -30,8 +30,9 @@ class PointCalculator {
     fun restoreCategories(outState: Bundle) {
         val savedCategories: ArrayList<Int> = outState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
         categories["Low"] = savedCategories[0]
-        for (x in 4..13) {
-            categories[x.toString()] = savedCategories[x-3]
+        for (x in 1 until savedCategories.size) {
+            Log.d(TAG, (x+3).toString())
+            categories[(x+3).toString()] = savedCategories[x]
         }
     }
 
