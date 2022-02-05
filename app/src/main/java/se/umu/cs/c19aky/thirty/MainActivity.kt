@@ -17,7 +17,7 @@ private const val STATE_DICE_VALUES = "diceValues"
 private const val STATE_COUNT_STATE = "countState"
 private const val STATE_ROUND_COUNTER = "currentRound"
 
-private const val MAX_ROUNDS = 2
+private const val MAX_ROUNDS = 10
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,8 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     private val startCountPointsForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
-        currentRound = 1
+        currentRound = 0
         pointCalculator = PointCalculator()
+        startNewRound()
     }
 
     // Save instance
@@ -157,21 +158,22 @@ class MainActivity : AppCompatActivity() {
 
     // Start a new round
     private fun startNewRound() {
-        if (currentRound == MAX_ROUNDS) {
-            Log.d(TAG, "Game completed, now it's time to show the player the result.")
+        if (currentRound != MAX_ROUNDS) {
+            currentRound += 1
+            countState = false
+            diceViewModel.clearLockedDice()
+            diceViewModel.throwDice()
+            diceViewModel.resetThrows()
+            updateDiceButtonImages()
+            updateThrowsLeft(throwCountText, diceViewModel.getThrowsLeft())
+            throwButton.setText(R.string.btn_throw)
+        } else {
+            // Game is now completed
             startCountPointsForResult.launch(Intent(this, GameResults::class.java).apply {
-                    putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
-                    putExtra(EXTRA_POINT_SUM, pointCalculator.getTotalPoints())
-                })
+                putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
+                putExtra(EXTRA_POINT_SUM, pointCalculator.getTotalPoints())
+            })
         }
-        currentRound += 1
-        countState = false
-        diceViewModel.clearLockedDice()
-        diceViewModel.throwDice()
-        diceViewModel.resetThrows()
-        updateDiceButtonImages()
-        updateThrowsLeft(throwCountText, diceViewModel.getThrowsLeft())
-        throwButton.setText(R.string.btn_throw)
     }
 
     // Update the images on all of the dice
