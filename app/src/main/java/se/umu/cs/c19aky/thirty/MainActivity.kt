@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
-import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_CATEGORIES
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
 
 private const val TAG = "MainActivity"
@@ -163,7 +162,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Game completed, now it's time to show the player the result.")
             startCountPointsForResult.launch(Intent(this, GameResults::class.java).apply {
                     putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
-                    putStringArrayListExtra(EXTRA_CATEGORIES, pointCalculator.getAllCategories())
                 })
         }
         currentRound += 1
