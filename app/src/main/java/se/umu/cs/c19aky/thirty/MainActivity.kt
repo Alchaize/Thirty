@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
+import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_POINT_SUM
 
 private const val TAG = "MainActivity"
 
@@ -27,15 +28,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceButtons: MutableList<ImageButton>
     private lateinit var categorySpinner: Spinner
     private var pointCalculator = PointCalculator()
-    private var currentRound: Int = 1
+    private var currentRound: Int = 0
 
     private var countState: Boolean = false
 
     private val startCountPointsForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            currentRound = 1
-        }
+        currentRound = 1
+        pointCalculator = PointCalculator()
     }
 
     // Save instance
@@ -162,6 +162,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Game completed, now it's time to show the player the result.")
             startCountPointsForResult.launch(Intent(this, GameResults::class.java).apply {
                     putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
+                    putExtra(EXTRA_POINT_SUM, pointCalculator.getTotalPoints())
                 })
         }
         currentRound += 1

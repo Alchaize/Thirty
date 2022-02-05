@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
@@ -17,9 +19,10 @@ private const val TAG = "GameResults"
 
 class GameResults : AppCompatActivity() {
 
+    private var pointSum: Int = 0
+    private lateinit var values: ArrayList<Int>
 
-
-    private fun returnResult(pointSum: Int) {
+    private fun returnResult() {
         val data = Intent()
         setResult(Activity.RESULT_OK, data)
         finish()
@@ -32,24 +35,48 @@ class GameResults : AppCompatActivity() {
         val results: LinearLayout = findViewById(R.id.LL_results)
 
         Log.d(TAG, "Getting stored categories and values")
-        val values: ArrayList<Int> = intent.getIntegerArrayListExtra(EXTRA_DICE_VALUES) as ArrayList<Int>
+        values = intent.getIntegerArrayListExtra(EXTRA_DICE_VALUES) as ArrayList<Int>
+        pointSum = intent.getIntExtra(EXTRA_POINT_SUM, 0) as Int
 
-        val categories2: Array<String> = resources.getStringArray(R.array.categories_array)
+        val categories: Array<String> = resources.getStringArray(R.array.categories_array)
 
 
         Log.d(TAG, "Adding categories and values to linear layout")
-        for (x in 0 until categories2.size) {
-            val textView = TextView(this)
-            textView.gravity = Gravity.CENTER
-            textView.textSize = 24.0f
-            textView.text = "${categories2[x]} \t ${values[x]}"
-            results.addView(textView)
+        for (x in categories.indices) {
+            results.addView(createTextView("${categories[x]}    ${values[x]}"))
+            results.addView(createSpacing())
         }
+        // Add sum
+        results.addView(createTextView("Sum    $pointSum"))
+
+        // Add button to go back
+        val returnButton = Button(this)
+        returnButton.setText(R.string.btn_done)
+        returnButton.gravity = Gravity.CENTER_HORIZONTAL
+        returnButton.textSize = 24.0f
+        returnButton.setOnClickListener { returnResult() }
+        results.addView(returnButton)
+
         Log.d(TAG, "Done")
     }
 
 
     companion object {
         const val EXTRA_DICE_VALUES = "Dice_values"
+        const val EXTRA_POINT_SUM = "Point_sum"
+    }
+
+    private fun createTextView(text: String): TextView {
+        val textView = TextView(this)
+        textView.gravity = Gravity.CENTER
+        textView.textSize = 24.0f
+        textView.text = text
+        return textView
+    }
+
+    private fun createSpacing(): Space {
+        val space: Space = Space(this)
+        space.minimumHeight = 24
+        return space
     }
 }
