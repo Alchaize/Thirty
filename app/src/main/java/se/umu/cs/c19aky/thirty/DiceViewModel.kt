@@ -18,18 +18,22 @@ class DiceViewModel : ViewModel() {
         Die(1, false),
     )
 
+    // Get the amount of throws left
     fun getThrowsLeft(): Int {
         return throwsLeft
     }
 
+    // Set throws left to something specific
     fun setThrowsLeft(throwCount: Int) {
         throwsLeft = throwCount
     }
 
+    // Reset the amount of throws
     fun resetThrows() {
         throwsLeft = MAX_THROWS
     }
 
+    // Throw the dice, assigning a new value to each of the unlocked dice
     fun throwDice() {
         for (die in diceList) {
             if (!die.locked) {
@@ -39,16 +43,19 @@ class DiceViewModel : ViewModel() {
         throwsLeft -= 1
     }
 
+    // Set the die value of a die
     fun setDiceValues(diceValues: ArrayList<Int>) {
         for (i in diceList.indices) {
             diceList[i].value = diceValues[i]
         }
     }
 
+    // Get the die value of a die
     fun getDieValue(index : Int): Int {
         return diceList[index].value
     }
 
+    // Get all dice values
     fun getDiceValues(): ArrayList<Int> {
         val diceValues = ArrayList<Int>()
         for (die in diceList) {
@@ -57,12 +64,14 @@ class DiceViewModel : ViewModel() {
         return diceValues
     }
 
+    // Set all dice to be unlocked
     fun clearLockedDice() {
         for (die in diceList) {
             die.locked = false
         }
     }
 
+    // Get all locked dice
     fun getLockedDiceValues(): ArrayList<Int> {
         val lockedDiceValues = ArrayList<Int>()
         for (die in diceList) {
@@ -73,10 +82,12 @@ class DiceViewModel : ViewModel() {
         return lockedDiceValues
     }
 
+    // Get the locked status of a die
     fun getDieLocked(index : Int) : Boolean {
         return diceList[index].locked
     }
 
+    // Set the locked status of a die
     fun setDieLocked(index: Int, locked : Boolean) {
         diceList[index].locked = locked
     }
