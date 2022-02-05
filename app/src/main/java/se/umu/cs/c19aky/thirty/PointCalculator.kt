@@ -67,15 +67,17 @@ class PointCalculator(numberOfCategories: Int = 9) {
         return sum
     }
 
-
+    // Add points to some category
     fun addPoints(points: Int, category: String) {
         categories[category] = points
     }
 
+    // Get points in some category
     fun getPoints(category: String): Int? {
         return categories[category]
     }
 
+    // Get the total amount of points from all categories
     fun getTotalPoints(): Int {
         var sum = 0
         for (x in categories.values) {
@@ -84,10 +86,12 @@ class PointCalculator(numberOfCategories: Int = 9) {
         return sum
     }
 
+    // Get a list of points, each entry is the amount of points in that category
     fun getAllPoints(): ArrayList<Int> {
         return ArrayList(categories.values)
     }
 
+    // Get all categories
     fun getAllCategories(): ArrayList<String> {
         return ArrayList(categories.keys)
     }
