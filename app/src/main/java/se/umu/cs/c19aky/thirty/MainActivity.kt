@@ -1,6 +1,5 @@
 package se.umu.cs.c19aky.thirty
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

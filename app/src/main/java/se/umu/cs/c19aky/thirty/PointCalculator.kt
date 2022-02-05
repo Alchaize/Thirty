@@ -35,7 +35,7 @@ class PointCalculator {
         }
     }
 
-    // Check if a given cateogory is chosen
+    // Check if a given category is chosen
     fun checkIfCategoryIsChosen(category: String): Boolean {
         return categories[category] != -1
     }

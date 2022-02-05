@@ -10,10 +10,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
-import androidx.core.view.marginBottom
-import androidx.core.view.marginTop
-import androidx.core.view.setPadding
-import org.w3c.dom.Text
 
 private const val TAG = "GameResults"
 

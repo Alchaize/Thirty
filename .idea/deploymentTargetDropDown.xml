@@ -6,12 +6,12 @@
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
           <Key>
-            <type value="SERIAL_NUMBER" />
-            <value value="2c72875" />
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\Alexa\.android\avd\Pixel_2_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2022-02-04T23:32:00.916152300Z" />
+    <timeTargetWasSelectedWithDropDown value="2022-02-05T02:27:00.381095200Z" />
   </component>
 </project>
