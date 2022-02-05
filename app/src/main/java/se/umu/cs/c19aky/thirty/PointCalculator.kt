@@ -13,7 +13,7 @@ class PointCalculator {
 
     init {
         categories["Low"] = -1
-        for (x in 4..13) {
+        for (x in 4..12) {
             categories[x.toString()] = -1
         }
     }
@@ -73,6 +73,14 @@ class PointCalculator {
 
     fun getPoints(category: String): Int? {
         return categories[category]
+    }
+
+    fun getTotalPoints(): Int {
+        var sum = 0
+        for (x in categories.values) {
+            sum += x
+        }
+        return sum
     }
 
     fun getAllPoints(): ArrayList<Int> {
