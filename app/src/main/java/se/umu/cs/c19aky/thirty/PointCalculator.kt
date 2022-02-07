@@ -9,6 +9,7 @@ private const val KEY_POINTS = "se.umu.cs.c19aky.categories"
 
 class PointCalculator(numberOfCategories: Int = 9) {
 
+    private var selectedCategory: String = ""
     private var categories: MutableMap<String, Int> = mutableMapOf()
 
     init {
@@ -36,26 +37,42 @@ class PointCalculator(numberOfCategories: Int = 9) {
         }
     }
 
-    // Check if a given category is chosen
-    fun checkIfCategoryIsChosen(category: String): Boolean {
-        return categories[category] != -1
+    // Check if a category has been chosen
+    fun checkIfCategoryIsChosen(): Boolean {
+        Log.d(TAG, "Selected category: $selectedCategory")
+        return selectedCategory != ""
     }
 
-    // Calculate points
-    fun calculatePoints(targetSum: Int, values: ArrayList<Int>): Int {
-        var sum = 0
-        for (value in values) {
-            sum += value
+    // Unselect category
+    fun unselectCategory() {
+        selectedCategory = ""
+    }
+
+    // Select category, returns true if category could be selected
+    fun selectCategory(category: String): Boolean {
+        if (categories[category] == -1) {
+            selectedCategory = category
+            return true
         }
-        return if (sum % targetSum == 0) {
-            sum
+        return false
+    }
+
+    fun calculatePoints(valuesLow: ArrayList<Int>, values: ArrayList<Int>): Int {
+        val sum = values.sum()
+        Log.d(TAG, "Sum: $sum , Category: $selectedCategory")
+        return if (selectedCategory == "Low") {
+            calculatePointsLow(valuesLow)
         } else {
-            -1
+            if (sum == selectedCategory.toInt()) {
+                sum
+            } else {
+                -1
+            }
         }
     }
 
     // Sum all values from 0 to 3
-    fun calculatePointsLow(values: ArrayList<Int>): Int {
+    private fun calculatePointsLow(values: ArrayList<Int>): Int {
         var sum = 0
         for (value in values) {
             sum += if (value <= 3) {
@@ -68,13 +85,23 @@ class PointCalculator(numberOfCategories: Int = 9) {
     }
 
     // Add points to some category
-    fun addPoints(points: Int, category: String) {
-        categories[category] = points
+    fun addPoints(points: Int) {
+        var current = categories[selectedCategory]
+        if (current != null) {
+            if (current == -1) {
+                current += points + 1
+            } else {
+                current += points
+            }
+        } else {
+            current = points
+        }
+        categories[selectedCategory] = current
     }
 
-    // Get points in some category
-    fun getPoints(category: String): Int? {
-        return categories[category]
+    // Get points in current category
+    fun getPoints(): Int? {
+        return categories[selectedCategory]
     }
 
     // Get the total amount of points from all categories
@@ -89,10 +116,5 @@ class PointCalculator(numberOfCategories: Int = 9) {
     // Get a list of points, each entry is the amount of points in that category
     fun getAllPoints(): ArrayList<Int> {
         return ArrayList(categories.values)
-    }
-
-    // Get all categories
-    fun getAllCategories(): ArrayList<String> {
-        return ArrayList(categories.keys)
     }
 }

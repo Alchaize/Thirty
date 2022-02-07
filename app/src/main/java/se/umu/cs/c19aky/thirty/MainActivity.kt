@@ -17,7 +17,7 @@ private const val STATE_DICE_VALUES = "diceValues"
 private const val STATE_COUNT_STATE = "countState"
 private const val STATE_ROUND_COUNTER = "currentRound"
 
-private const val MAX_ROUNDS = 10
+private const val MAX_ROUNDS = 3
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,8 +64,10 @@ class MainActivity : AppCompatActivity() {
         for (imgButton in diceButtons) {
             imgButton.setOnClickListener {
                 val index = diceButtons.indexOf(imgButton)
-                diceViewModel.setDieLocked(index, !diceViewModel.getDieLocked(index))
-                updateDiceButtonImages()
+                if (!diceViewModel.getDieUsed(index)) {
+                    diceViewModel.setDieLocked(index, !diceViewModel.getDieLocked(index))
+                    updateDiceButtonImages()
+                }
             }
         }
 
@@ -74,19 +76,24 @@ class MainActivity : AppCompatActivity() {
 
             when (val throwsLeft = diceViewModel.getThrowsLeft()) {
 
-                0 -> {if(tryGettingPoints()) {
-                    startNewRound()
+                0 -> {if (pointCalculator.checkIfCategoryIsChosen()) {
+                    if (!tryGettingPoints()) {
+                        startNewRound()
+                        pointCalculator.unselectCategory()
+                    }
+                } else {
+                    lockUserToCategory()
                 }}
 
                 1 -> {countState = true
                     diceViewModel.throwDice()
-                    updateThrowsLeft(throwCountText, 0)
+                    updateThrowsLeft(0)
                     updateDiceButtonImages()
                     throwButton.setText(R.string.btn_continue)}
 
                 else -> {diceViewModel.throwDice()
                     updateDiceButtonImages()
-                    updateThrowsLeft(throwCountText, throwsLeft-1)}
+                    updateThrowsLeft(throwsLeft-1)}
             }
         }
 
@@ -111,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             currentRound = savedInstanceState.getInt(STATE_ROUND_COUNTER)
             diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
             diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
-            updateThrowsLeft(throwCountText, diceViewModel.getThrowsLeft())
+            updateThrowsLeft(diceViewModel.getThrowsLeft())
             updateDiceButtonImages()
             pointCalculator.restoreCategories(savedInstanceState)
         } else {
@@ -119,35 +126,56 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Try to get points using the currently selected spinner and dice
-    private fun tryGettingPoints(): Boolean {
+    private fun lockUserToCategory() {
         val selectedCategory: String = categorySpinner.selectedItem as String
-
-        // Check if category is already used
-        if (!pointCalculator.checkIfCategoryIsChosen(selectedCategory)) {
-
-            // Use the appropriate way to calculate the sum to store
-            val sum = if (selectedCategory == "Low") {
-                pointCalculator.calculatePointsLow(diceViewModel.getDiceValues())
-            } else {
-                pointCalculator.calculatePoints((selectedCategory).toInt(), diceViewModel.getLockedDiceValues())
-            }
-
-            // Make sure that the selected dice works for the current category before storing
-            return checkSelection(sum, selectedCategory)
-
+        // Lock user to a category if it hasn't been chosen yet
+        if (pointCalculator.selectCategory(selectedCategory)) {
+            val toast = Toast.makeText(this, resources.getString(R.string.tt_category_selected), Toast.LENGTH_SHORT)
+            toast.show()
         } else {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_already_chosen), Toast.LENGTH_SHORT)
             toast.show()
+        }
+    }
+
+    // Try to get points using the currently selected spinner and dice, returns true if user tries to add points
+    private fun tryGettingPoints(): Boolean {
+
+        val sum = pointCalculator.calculatePoints(diceViewModel.getDiceValues(), diceViewModel.getLockedDiceValues())
+        Log.d(TAG, "Sum returned: $sum")
+
+        if (sum == 0) {
+            // Only happens when the "Low" category has been chosen
+            checkSelection(sum)
             return false
         }
 
+        if (sum != 0 && diceViewModel.getLockedDiceValues().size == 0) {
+            checkSelection(sum)
+            return false
+        }
+
+        if ((sum == -1 && diceViewModel.getLockedDiceValues().size == 0)) {
+            return false
+        }
+
+        // Make sure that the selected dice works for the current category before storing
+        if(checkSelection(sum)) {
+            // Dice selection was valid, mark the dice as used.
+            diceViewModel.useLockedDice()
+            diceViewModel.clearLockedDice()
+            updateDiceButtonImages()
+        }
+
+        return true
     }
 
     // Make sure that only valid dice selections are stored.
-    private fun checkSelection(sum: Int, category: String): Boolean {
+    private fun checkSelection(sum: Int): Boolean {
         return if (sum >= 0) {
-            pointCalculator.addPoints(sum, category)
+            val toast = Toast.makeText(this, resources.getString(R.string.tt_added_points), Toast.LENGTH_SHORT)
+            toast.show()
+            pointCalculator.addPoints(sum)
             true
         } else {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_invalid_selection), Toast.LENGTH_SHORT)
@@ -162,10 +190,11 @@ class MainActivity : AppCompatActivity() {
             currentRound += 1
             countState = false
             diceViewModel.clearLockedDice()
+            diceViewModel.clearUsedDice()
             diceViewModel.throwDice()
             diceViewModel.resetThrows()
             updateDiceButtonImages()
-            updateThrowsLeft(throwCountText, diceViewModel.getThrowsLeft())
+            updateThrowsLeft(diceViewModel.getThrowsLeft())
             throwButton.setText(R.string.btn_throw)
         } else {
             // Game is now completed
@@ -238,11 +267,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Update the text showing how many throws are left
-    private fun updateThrowsLeft(textView: TextView, throwsLeft: Int) {
+    private fun updateThrowsLeft(throwsLeft: Int) {
         when(throwsLeft) {
-            2 -> textView.setText(R.string.tv_throws_left_2)
-            1 -> textView.setText(R.string.tv_throws_left_1)
-            else -> textView.setText(R.string.tv_throws_left_0)
+            2 -> throwCountText.setText(R.string.tv_throws_left_2)
+            1 -> throwCountText.setText(R.string.tv_throws_left_1)
+            else -> throwCountText.setText(R.string.tv_throws_left_0)
         }
     }
 }

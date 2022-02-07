@@ -10,12 +10,12 @@ class DiceViewModel : ViewModel() {
 
     private var throwsLeft = MAX_THROWS
     private val diceList = listOf(
-        Die(1, false),
-        Die( 1, false),
-        Die( 1, false),
-        Die( 1, false),
-        Die( 1, false),
-        Die(1, false),
+        Die(1, false, used = false),
+        Die( 1, false, used = false),
+        Die( 1, false, used = false),
+        Die( 1, false, used = false),
+        Die( 1, false, used = false),
+        Die(1, false, used = false),
     )
 
     // Get the amount of throws left
@@ -90,5 +90,29 @@ class DiceViewModel : ViewModel() {
     // Set the locked status of a die
     fun setDieLocked(index: Int, locked : Boolean) {
         diceList[index].locked = locked
+    }
+
+    // Use a die, preventing it from being locked
+    fun setDieUsed(index: Int, used: Boolean) {
+        diceList[index].used = used
+    }
+
+    // Get the locked status of a die
+    fun getDieUsed(index : Int) : Boolean {
+        return diceList[index].used
+    }
+
+    fun clearUsedDice() {
+        for (die in diceList) {
+            die.used = false
+        }
+    }
+
+    fun useLockedDice() {
+        for (die in diceList) {
+            if (die.locked) {
+                die.used = true
+            }
+        }
     }
 }

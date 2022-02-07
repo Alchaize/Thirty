@@ -14,6 +14,8 @@
 
     <string name="tt_category_already_chosen">You have already chosen this category.</string>
     <string name="tt_invalid_selection">Invalid dice selection. Please reevaluate your selection.</string>
+    <string name="tt_added_points">Added points to selected category</string>
+    <string name="tt_category_selected">Category selected, now add some points!</string>
 
     <string-array name="categories_array">
         <item>Low</item>
