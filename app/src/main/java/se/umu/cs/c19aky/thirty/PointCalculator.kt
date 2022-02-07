@@ -21,7 +21,6 @@ class PointCalculator(numberOfCategories: Int = 9) {
 
     // Store categories, for restoring when able to
     fun storeCategories(outState: Bundle) {
-        Log.d(TAG, categories.values.toString())
         val toSave: ArrayList<Int> = arrayListOf()
         toSave.addAll(categories.values)
         outState.putIntegerArrayList(KEY_POINTS, toSave)
@@ -32,15 +31,18 @@ class PointCalculator(numberOfCategories: Int = 9) {
         val savedCategories: ArrayList<Int> = outState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
         categories["Low"] = savedCategories[0]
         for (x in 1 until savedCategories.size) {
-            Log.d(TAG, (x+3).toString())
             categories[(x+3).toString()] = savedCategories[x]
         }
     }
 
-    // Check if a category has been chosen
-    fun checkIfCategoryIsChosen(): Boolean {
+    // Check if a category has been chosen, returns a string containing the category if there is.
+    fun checkIfCategoryIsChosen(): String? {
         Log.d(TAG, "Selected category: $selectedCategory")
-        return selectedCategory != ""
+        return if (selectedCategory != "") {
+            selectedCategory
+        } else {
+            null
+        }
     }
 
     // Unselect category
@@ -57,9 +59,9 @@ class PointCalculator(numberOfCategories: Int = 9) {
         return false
     }
 
+    // Calculate points using current category
     fun calculatePoints(valuesLow: ArrayList<Int>, values: ArrayList<Int>): Int {
         val sum = values.sum()
-        Log.d(TAG, "Sum: $sum , Category: $selectedCategory")
         return if (selectedCategory == "Low") {
             calculatePointsLow(valuesLow)
         } else {
@@ -73,25 +75,31 @@ class PointCalculator(numberOfCategories: Int = 9) {
 
     // Sum all values from 0 to 3
     private fun calculatePointsLow(values: ArrayList<Int>): Int {
+        var foundAny = false
         var sum = 0
         for (value in values) {
             sum += if (value <= 3) {
+                foundAny = true
                 value
             } else {
                 0
             }
         }
-        return sum
+        return if (foundAny) {
+            sum
+        } else {
+            -1
+        }
     }
 
     // Add points to some category
     fun addPoints(points: Int) {
         var current = categories[selectedCategory]
         if (current != null) {
-            if (current == -1) {
-                current += points + 1
+            current += if (current == -1) {
+                points + 1
             } else {
-                current += points
+                points
             }
         } else {
             current = points

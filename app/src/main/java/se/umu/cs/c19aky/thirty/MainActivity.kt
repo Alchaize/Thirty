@@ -14,10 +14,6 @@ private const val TAG = "MainActivity"
 
 private const val STATE_THROWS = "throwsLeft"
 private const val STATE_DICE_VALUES = "diceValues"
-private const val STATE_COUNT_STATE = "countState"
-private const val STATE_ROUND_COUNTER = "currentRound"
-
-private const val MAX_ROUNDS = 3
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,26 +22,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var diceViewModel : DiceViewModel
     private lateinit var diceButtons: MutableList<ImageButton>
     private lateinit var categorySpinner: Spinner
-    private var pointCalculator = PointCalculator()
-    private var currentRound: Int = 0
-
-    private var countState: Boolean = false
+    private var gameLogic = GameLogic()
 
     private val startCountPointsForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
-        currentRound = 0
-        pointCalculator = PointCalculator()
+        gameLogic.resetRounds()
         startNewRound()
     }
 
     // Save instance
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d(TAG, "Saving instance")
-        outState.putInt(STATE_ROUND_COUNTER, currentRound)
         outState.putInt(STATE_THROWS, diceViewModel.getThrowsLeft())
         outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
-        outState.putBoolean(STATE_COUNT_STATE, countState)
-        pointCalculator.storeCategories(outState)
+        gameLogic.saveInstance(outState)
         super.onSaveInstanceState(outState)
     }
 
@@ -76,22 +66,20 @@ class MainActivity : AppCompatActivity() {
 
             when (val throwsLeft = diceViewModel.getThrowsLeft()) {
 
-                0 -> {if (pointCalculator.checkIfCategoryIsChosen()) {
+                0 -> {Log.d(TAG, "Count phase")
+                    if (lockUserToCategory()) {
                     if (!tryGettingPoints()) {
+                        gameLogic.newGame(diceViewModel)
                         startNewRound()
-                        pointCalculator.unselectCategory()
-                    }
-                } else {
-                    lockUserToCategory()
-                }}
+                    }}}
 
-                1 -> {countState = true
-                    diceViewModel.throwDice()
-                    updateThrowsLeft(0)
+                1 -> {Log.d(TAG, "Just before count phase")
+                    gameLogic.nextRound(diceViewModel)
                     updateDiceButtonImages()
-                    throwButton.setText(R.string.btn_continue)}
+                    throwButton.setText(R.string.btn_select)}
 
-                else -> {diceViewModel.throwDice()
+                else -> {Log.d(TAG, "Not count phase")
+                    gameLogic.nextRound(diceViewModel)
                     updateDiceButtonImages()
                     updateThrowsLeft(throwsLeft-1)}
             }
@@ -115,92 +103,73 @@ class MainActivity : AppCompatActivity() {
         // If instance has been saved, restore that data
         if (savedInstanceState != null) {
             Log.d(TAG, "Restoring instance")
-            currentRound = savedInstanceState.getInt(STATE_ROUND_COUNTER)
             diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
             diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
             updateThrowsLeft(diceViewModel.getThrowsLeft())
+            gameLogic.restoreInstance(savedInstanceState)
             updateDiceButtonImages()
-            pointCalculator.restoreCategories(savedInstanceState)
         } else {
             startNewRound()
         }
     }
 
-    private fun lockUserToCategory() {
-        val selectedCategory: String = categorySpinner.selectedItem as String
+    private fun lockUserToCategory(): Boolean {
+        val category = categorySpinner.selectedItem as String
         // Lock user to a category if it hasn't been chosen yet
-        if (pointCalculator.selectCategory(selectedCategory)) {
+        return if (gameLogic.categorySelected(category)) {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_selected), Toast.LENGTH_SHORT)
             toast.show()
+            true
         } else {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_already_chosen), Toast.LENGTH_SHORT)
             toast.show()
+            false
         }
     }
 
     // Try to get points using the currently selected spinner and dice, returns true if user tries to add points
     private fun tryGettingPoints(): Boolean {
 
-        val sum = pointCalculator.calculatePoints(diceViewModel.getDiceValues(), diceViewModel.getLockedDiceValues())
-        Log.d(TAG, "Sum returned: $sum")
+        val valid = gameLogic.runCountPhase(diceViewModel)
+        Log.d(TAG, "Selection validity: $valid")
 
-        if (sum == 0) {
-            // Only happens when the "Low" category has been chosen
-            checkSelection(sum)
-            return false
-        }
+        // Message user about result
+        messageUserAboutSelection(valid)
 
-        if (sum != 0 && diceViewModel.getLockedDiceValues().size == 0) {
-            checkSelection(sum)
-            return false
-        }
-
-        if ((sum == -1 && diceViewModel.getLockedDiceValues().size == 0)) {
-            return false
-        }
-
-        // Make sure that the selected dice works for the current category before storing
-        if(checkSelection(sum)) {
-            // Dice selection was valid, mark the dice as used.
+        // Dice selection was valid, mark the dice as used.
+        if(valid) {
             diceViewModel.useLockedDice()
             diceViewModel.clearLockedDice()
             updateDiceButtonImages()
         }
-
-        return true
+        return valid
     }
 
-    // Make sure that only valid dice selections are stored.
-    private fun checkSelection(sum: Int): Boolean {
-        return if (sum >= 0) {
+    // Message user on whether the selection was valid or not
+    private fun messageUserAboutSelection(valid: Boolean) {
+        if (valid) {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_added_points), Toast.LENGTH_SHORT)
             toast.show()
-            pointCalculator.addPoints(sum)
-            true
         } else {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_invalid_selection), Toast.LENGTH_SHORT)
             toast.show()
-            false
         }
     }
 
     // Start a new round
     private fun startNewRound() {
-        if (currentRound != MAX_ROUNDS) {
-            currentRound += 1
-            countState = false
-            diceViewModel.clearLockedDice()
-            diceViewModel.clearUsedDice()
-            diceViewModel.throwDice()
-            diceViewModel.resetThrows()
+        if (!gameLogic.isGameDone()) {
+            Log.d(TAG, "Starting a new round")
+            gameLogic.nextRound(diceViewModel)
             updateDiceButtonImages()
             updateThrowsLeft(diceViewModel.getThrowsLeft())
             throwButton.setText(R.string.btn_throw)
         } else {
+            Log.d(TAG, "Booting result activity")
             // Game is now completed
             startCountPointsForResult.launch(Intent(this, GameResults::class.java).apply {
-                putIntegerArrayListExtra(EXTRA_DICE_VALUES, pointCalculator.getAllPoints())
-                putExtra(EXTRA_POINT_SUM, pointCalculator.getTotalPoints())
+                putIntegerArrayListExtra(EXTRA_DICE_VALUES, gameLogic.getPoints())
+                putExtra(EXTRA_POINT_SUM, gameLogic.getTotalPoints())
             })
         }
     }
@@ -229,7 +198,7 @@ class MainActivity : AppCompatActivity() {
         } else {
 
             // Use different dice depending on which state the player is in
-            val image = if (countState) {
+            val image = if (gameLogic.getCountPhase()) {
                 when(diceViewModel.getDieValue(index)) {
                     1 -> R.drawable.red1
                     2 -> R.drawable.red2

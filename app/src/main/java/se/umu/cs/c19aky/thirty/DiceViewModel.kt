@@ -102,6 +102,33 @@ class DiceViewModel : ViewModel() {
         return diceList[index].used
     }
 
+    // Set all dice to be used
+    fun setAllDiceUsed() {
+        for (die in diceList) {
+            die.used = true
+        }
+    }
+
+    fun getAllUsedDiceValues() : ArrayList<Int> {
+        val usedDiceValues = ArrayList<Int>()
+        for (die in diceList) {
+            if (die.locked) {
+                usedDiceValues.add(die.value)
+            }
+        }
+        return usedDiceValues
+    }
+
+    fun getAllUnusedDiceValues() : ArrayList<Int> {
+        val usedDiceValues = ArrayList<Int>()
+        for (die in diceList) {
+            if (!die.used) {
+                usedDiceValues.add(die.value)
+            }
+        }
+        return usedDiceValues
+    }
+
     fun clearUsedDice() {
         for (die in diceList) {
             die.used = false
@@ -114,5 +141,10 @@ class DiceViewModel : ViewModel() {
                 die.used = true
             }
         }
+    }
+
+    companion object {
+        private const val STATE_THROWS = "throwsLeft"
+        private const val STATE_DICE_VALUES = "diceValues"
     }
 }

@@ -3,6 +3,8 @@
 
     <string name="btn_throw">Throw</string>
     <string name="btn_continue">Continue</string>
+    <string name="btn_select">Select</string>
+    <string name="btn_save">Add</string>
     <string name="btn_done">Done</string>
 
     <string name="tv_throws_left_2">Throws left: 2</string>
