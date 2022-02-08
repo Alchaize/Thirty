@@ -26,8 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private val startCountPointsForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
-        gameLogic.resetRounds()
-        startNewRound()
+        startNewGame()
     }
 
     // Save instance
@@ -63,25 +62,23 @@ class MainActivity : AppCompatActivity() {
 
         // On click listener for throw button
         throwButton.setOnClickListener {
+            when (diceViewModel.getThrowsLeft()) {
 
-            when (val throwsLeft = diceViewModel.getThrowsLeft()) {
-
-                0 -> {Log.d(TAG, "Count phase")
-                    if (lockUserToCategory()) {
+                0 -> {if (gameLogic.categorySelected()) {
+                    Log.d(TAG, "Category was selected")
                     if (!tryGettingPoints()) {
-                        gameLogic.newGame(diceViewModel)
+                        Log.d(TAG, "User was ready to proceed to next round")
+                        gameLogic.nextRound(diceViewModel)
                         startNewRound()
-                    }}}
+                    }} else {
+                        Log.d(TAG, "Category was not already selected, trying to...")
+                        lockUserToCategory()
+                    }}
 
-                1 -> {Log.d(TAG, "Just before count phase")
-                    gameLogic.nextRound(diceViewModel)
-                    updateDiceButtonImages()
+                1 -> {nextPhase()
                     throwButton.setText(R.string.btn_select)}
 
-                else -> {Log.d(TAG, "Not count phase")
-                    gameLogic.nextRound(diceViewModel)
-                    updateDiceButtonImages()
-                    updateThrowsLeft(throwsLeft-1)}
+                else -> {nextPhase()}
             }
         }
 
@@ -109,14 +106,17 @@ class MainActivity : AppCompatActivity() {
             gameLogic.restoreInstance(savedInstanceState)
             updateDiceButtonImages()
         } else {
-            startNewRound()
+            Log.d(TAG, "No saved instance, starting new game")
+            startNewGame()
         }
     }
 
+    // Lock user to the currently chosen category. Returns true if possible
     private fun lockUserToCategory(): Boolean {
         val category = categorySpinner.selectedItem as String
+
         // Lock user to a category if it hasn't been chosen yet
-        return if (gameLogic.categorySelected(category)) {
+        return if (gameLogic.selectCategory(category)) {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_selected), Toast.LENGTH_SHORT)
             toast.show()
             true
@@ -131,7 +131,6 @@ class MainActivity : AppCompatActivity() {
     private fun tryGettingPoints(): Boolean {
 
         val valid = gameLogic.runCountPhase(diceViewModel)
-        Log.d(TAG, "Selection validity: $valid")
 
         // Message user about result
         messageUserAboutSelection(valid)
@@ -142,7 +141,7 @@ class MainActivity : AppCompatActivity() {
             diceViewModel.clearLockedDice()
             updateDiceButtonImages()
         }
-        return valid
+        return !valid
     }
 
     // Message user on whether the selection was valid or not
@@ -156,6 +155,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Start a new game
+    private fun startNewGame() {
+        gameLogic.newGame(diceViewModel)
+        updateDiceButtonImages()
+    }
+
     // Start a new round
     private fun startNewRound() {
         if (!gameLogic.isGameDone()) {
@@ -164,6 +169,7 @@ class MainActivity : AppCompatActivity() {
             updateDiceButtonImages()
             updateThrowsLeft(diceViewModel.getThrowsLeft())
             throwButton.setText(R.string.btn_throw)
+            Log.d(TAG, "Throws left: ${diceViewModel.getThrowsLeft()}")
         } else {
             Log.d(TAG, "Booting result activity")
             // Game is now completed
@@ -172,6 +178,13 @@ class MainActivity : AppCompatActivity() {
                 putExtra(EXTRA_POINT_SUM, gameLogic.getTotalPoints())
             })
         }
+    }
+
+    // Move to next phase
+    private fun nextPhase() {
+        gameLogic.nextPhase(diceViewModel)
+        updateDiceButtonImages()
+        updateThrowsLeft(diceViewModel.getThrowsLeft())
     }
 
     // Update the images on all of the dice

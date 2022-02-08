@@ -48,17 +48,28 @@ class GameLogic {
 
     // Start a new game
     fun newGame(diceViewModel: DiceViewModel) {
+        resetRounds()
+
+        diceViewModel.clearLockedDice()
+        diceViewModel.clearUsedDice()
+        diceViewModel.throwDice()
+        diceViewModel.resetThrows()
+
+        pointCalculator.unselectCategory()
+    }
+
+    // Go to next round
+    fun nextRound(diceViewModel: DiceViewModel) {
         round += 1
         countPhase = false
 
         diceViewModel.clearLockedDice()
         diceViewModel.clearUsedDice()
-        diceViewModel.setThrowsLeft(3)
-
-        pointCalculator.unselectCategory()
+        diceViewModel.throwDice()
+        diceViewModel.resetThrows()
     }
 
-    fun nextRound(diceViewModel: DiceViewModel) {
+    fun nextPhase(diceViewModel: DiceViewModel) {
         diceViewModel.throwDice()
         if (diceViewModel.getThrowsLeft() == 0) {
             countPhase = true
@@ -69,26 +80,39 @@ class GameLogic {
         return countPhase
     }
 
-    // Run the count phase, calculating points in some category.
+    fun checkIfValidSelection(diceViewModel: DiceViewModel): Boolean {
+        return true
+    }
+
+    // Get points from selection, returns true points were added
     fun runCountPhase(diceViewModel: DiceViewModel): Boolean {
+
         val sum = pointCalculator.calculatePoints(diceViewModel.getAllUnusedDiceValues(), diceViewModel.getLockedDiceValues())
 
-        // Check if combination didn't work
-        if (sum == -1) {
-            return false
-        }
+        // Split into whether user chose any dice or not
+        if (diceViewModel.getLockedDiceValues().size != 0) {
 
-        // If no dice were locked, but a sum was still found that means the category "Low" was used
-        if (sum >= 0 && diceViewModel.getLockedDiceValues().size == 0) {
-            diceViewModel.setAllDiceUsed()
-        }
+            // Check if combination didn't work
+            if (sum == -1) {
+                return false
+            }
 
+        } else {
+            // If no dice were locked, but a sum was still found that means the category "Low" was used
+            if (sum == -1) {
+                return false
+            }
+        }
         // Add points
         pointCalculator.addPoints(sum)
         return true
     }
 
-    fun categorySelected(category: String): Boolean {
+    fun selectCategory(category: String): Boolean {
         return pointCalculator.selectCategory(category)
+    }
+
+    fun categorySelected(): Boolean {
+        return pointCalculator.checkIfCategoryIsChosen()
     }
 }

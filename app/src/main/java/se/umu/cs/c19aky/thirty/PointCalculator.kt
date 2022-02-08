@@ -35,14 +35,9 @@ class PointCalculator(numberOfCategories: Int = 9) {
         }
     }
 
-    // Check if a category has been chosen, returns a string containing the category if there is.
-    fun checkIfCategoryIsChosen(): String? {
-        Log.d(TAG, "Selected category: $selectedCategory")
-        return if (selectedCategory != "") {
-            selectedCategory
-        } else {
-            null
-        }
+    // Check if a category has been chosen, returns true it is
+    fun checkIfCategoryIsChosen(): Boolean {
+        return selectedCategory != ""
     }
 
     // Unselect category
