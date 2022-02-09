@@ -10,7 +10,8 @@ private const val KEY_CATEGORIES = "se.umu.cs.c19aky.categories"
 private const val KEY_SELECTED = "se.umu.cs.c19aky.selected_category"
 
 /*
-* Class for calculating and keeping track of points in categories*/
+* Class for calculating and keeping track of points in categories
+* */
 class PointCalculator(numberOfCategories: Int = 9) {
 
     private var selectedCategory: Int = -1

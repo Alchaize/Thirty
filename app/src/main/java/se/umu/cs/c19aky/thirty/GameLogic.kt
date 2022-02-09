@@ -10,6 +10,9 @@ private const val STATE_ROUND_COUNTER = "currentRound"
 
 private const val TAG = "GameLogic"
 
+/*
+* Class for the game logic
+* */
 class GameLogic {
 
     private var pointCalculator: PointCalculator = PointCalculator()

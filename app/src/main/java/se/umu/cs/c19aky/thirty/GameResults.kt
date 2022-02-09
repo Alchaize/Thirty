@@ -13,6 +13,7 @@ import android.widget.TextView
 
 private const val TAG = "GameResults"
 
+/* Activity for displaying the results of the game */
 class GameResults : AppCompatActivity() {
 
     private var pointSum: Int = 0

@@ -15,6 +15,7 @@ private const val TAG = "MainActivity"
 private const val STATE_THROWS = "throwsLeft"
 private const val STATE_DICE_VALUES = "diceValues"
 
+/* Main activity of app */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var throwButton: Button
