@@ -5,7 +5,9 @@ import android.util.Log
 
 private const val TAG = "PointCalculator"
 
-private const val KEY_POINTS = "se.umu.cs.c19aky.categories"
+private const val KEY_POINTS = "se.umu.cs.c19aky.points"
+private const val KEY_CATEGORIES = "se.umu.cs.c19aky.categories"
+private const val KEY_SELECTED = "se.umu.cs.c19aky.selected_category"
 
 class PointCalculator(numberOfCategories: Int = 9) {
 
@@ -13,6 +15,7 @@ class PointCalculator(numberOfCategories: Int = 9) {
     private var categories: MutableMap<String, Int> = mutableMapOf()
 
     init {
+        // Standard categories
         categories["Low"] = -1
         for (x in 4 until numberOfCategories + 4) {
             categories[x.toString()] = -1
@@ -21,18 +24,26 @@ class PointCalculator(numberOfCategories: Int = 9) {
 
     // Store categories, for restoring when able to
     fun storeCategories(outState: Bundle) {
-        val toSave: ArrayList<Int> = arrayListOf()
-        toSave.addAll(categories.values)
-        outState.putIntegerArrayList(KEY_POINTS, toSave)
+        val points: ArrayList<Int> = arrayListOf()
+        points.addAll(categories.values)
+        outState.putIntegerArrayList(KEY_POINTS, points)
+
+        val categories: ArrayList<String> = arrayListOf()
+        categories.addAll(this.categories.keys)
+        outState.putStringArrayList(KEY_CATEGORIES, categories)
+
+        outState.putString(KEY_SELECTED, selectedCategory)
     }
 
-    // Restore categories
-    fun restoreCategories(outState: Bundle) {
-        val savedCategories: ArrayList<Int> = outState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
-        categories["Low"] = savedCategories[0]
-        for (x in 1 until savedCategories.size) {
-            categories[(x+3).toString()] = savedCategories[x]
+    // Restore points, categories and selected category
+    fun restoreCategories(savedInstanceState: Bundle) {
+        val points: ArrayList<Int> = savedInstanceState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
+        val categories: ArrayList<String> = savedInstanceState.getStringArrayList(KEY_CATEGORIES) as ArrayList<String>
+
+        for (x in 0 until categories.size) {
+            this.categories[categories[x]] = points[x]
         }
+        selectedCategory = savedInstanceState.getString(KEY_SELECTED) as String
     }
 
     // Check if a category has been chosen, returns true it is
