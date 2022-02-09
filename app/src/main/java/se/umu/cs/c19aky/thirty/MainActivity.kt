@@ -63,12 +63,9 @@ class MainActivity : AppCompatActivity() {
         // On click listener for throw button
         throwButton.setOnClickListener {
             when (diceViewModel.getThrowsLeft()) {
-
                 0 -> {calculatingPhase()}
-
                 1 -> {nextPhase()
                     throwButton.setText(R.string.btn_select)}
-
                 else -> {nextPhase()}
             }
         }
@@ -102,6 +99,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Run the calculating phase, before ending the round
     private fun calculatingPhase() {
         // Check if category has been chosen
         if (gameLogic.categorySelected()) {
@@ -210,19 +208,9 @@ class MainActivity : AppCompatActivity() {
             }
             button.setImageResource(image)
         } else {
-
             // Use different dice depending on which state the player is in
-            val image = if (gameLogic.getCountPhase()) {
-                when(diceViewModel.getDieValue(index)) {
-                    1 -> R.drawable.red1
-                    2 -> R.drawable.red2
-                    3 -> R.drawable.red3
-                    4 -> R.drawable.red4
-                    5 -> R.drawable.red5
-                    6 -> R.drawable.red6
-                    else -> throw Exception("Die value outside of 1-6")
-                }
-            } else {
+            val image = if (!gameLogic.getCountPhase()) {
+                // Grey dice for the normal phases
                 when(diceViewModel.getDieValue(index)) {
                     1 -> R.drawable.grey1
                     2 -> R.drawable.grey2
@@ -230,6 +218,17 @@ class MainActivity : AppCompatActivity() {
                     4 -> R.drawable.grey4
                     5 -> R.drawable.grey5
                     6 -> R.drawable.grey6
+                    else -> throw Exception("Die value outside of 1-6")
+                }
+            } else {
+                // Red dice for counting phase
+                when(diceViewModel.getDieValue(index)) {
+                    1 -> R.drawable.red1
+                    2 -> R.drawable.red2
+                    3 -> R.drawable.red3
+                    4 -> R.drawable.red4
+                    5 -> R.drawable.red5
+                    6 -> R.drawable.red6
                     else -> throw Exception("Die value outside of 1-6")
                 }
             }
@@ -253,7 +252,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateThrowsLeft(throwsLeft: Int) {
         Log.d(TAG, "Throws left $throwsLeft")
         var str: String = resources.getString(R.string.tv_throws_left)
-        str += throwsLeft.toString()
+        str += " $throwsLeft"
         throwCountText.text = str
     }
 }
