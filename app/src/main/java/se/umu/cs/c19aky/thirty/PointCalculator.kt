@@ -77,8 +77,15 @@ class PointCalculator(numberOfCategories: Int = 9) {
         return false
     }
 
+    // Check if a selection of values are valid
     fun checkIfValidSelection(values: ArrayList<Int>): Boolean {
         return if (categories[selectedCategory].categoryName == "Low") {
+            // Since this category is calculated differently, there's no need to make sure
+            for (x in values) {
+                if (x > 3) {
+                    return false
+                }
+            }
             true
         } else {
             values.sum() == categories[selectedCategory].categoryName.toInt()
