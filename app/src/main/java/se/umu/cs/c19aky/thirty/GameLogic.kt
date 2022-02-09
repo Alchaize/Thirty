@@ -3,7 +3,7 @@ package se.umu.cs.c19aky.thirty
 import android.os.Bundle
 import android.util.Log
 
-private const val MAX_ROUNDS = 3
+private const val MAX_ROUNDS = 2
 
 private const val STATE_COUNT_PHASE = "countPhase"
 private const val STATE_ROUND_COUNTER = "currentRound"
@@ -13,7 +13,7 @@ private const val TAG = "GameLogic"
 class GameLogic {
 
     private var pointCalculator: PointCalculator = PointCalculator()
-    private var round: Int = 0
+    private var round: Int = 1
     private var countPhase: Boolean = false
 
     fun saveInstance(outState: Bundle) {
@@ -42,13 +42,9 @@ class GameLogic {
         return round >= MAX_ROUNDS
     }
 
-    fun resetRounds() {
-        round = 0
-    }
-
     // Start a new game
     fun newGame(diceViewModel: DiceViewModel) {
-        resetRounds()
+        round = 1
 
         diceViewModel.clearLockedDice()
         diceViewModel.clearUsedDice()
@@ -97,16 +93,17 @@ class GameLogic {
 
         // Split into whether user chose any dice or not
         if (diceViewModel.getLockedDiceValues().size != 0) {
-
             // Check if combination didn't work
             if (sum == -1) {
                 return false
             }
-
         } else {
             // If no dice were locked, but a sum was still found that means the category "Low" was used
             if (sum == -1) {
                 return false
+            } else {
+                // Use all dice since we don't want the user to add the points unlimited times
+                diceViewModel.setAllDiceUsed()
             }
         }
         // Add points

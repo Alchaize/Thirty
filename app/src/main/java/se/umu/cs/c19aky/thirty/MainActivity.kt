@@ -134,6 +134,9 @@ class MainActivity : AppCompatActivity() {
         return if (gameLogic.selectCategory(category)) {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_selected), Toast.LENGTH_SHORT)
             toast.show()
+
+            // Indicate that user will be adding points now
+            throwButton.setText(R.string.btn_add)
             true
         } else {
             val toast = Toast.makeText(this, resources.getString(R.string.tt_category_already_chosen), Toast.LENGTH_SHORT)
@@ -168,7 +171,6 @@ class MainActivity : AppCompatActivity() {
             updateDiceButtonImages()
             updateThrowsLeft(diceViewModel.getThrowsLeft())
             throwButton.setText(R.string.btn_throw)
-            Log.d(TAG, "Throws left: ${diceViewModel.getThrowsLeft()}")
         } else {
             Log.d(TAG, "Booting result activity")
             // Game is now completed
