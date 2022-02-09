@@ -64,16 +64,7 @@ class MainActivity : AppCompatActivity() {
         throwButton.setOnClickListener {
             when (diceViewModel.getThrowsLeft()) {
 
-                0 -> {if (gameLogic.categorySelected()) {
-                    Log.d(TAG, "Category was selected")
-                    if (!tryGettingPoints()) {
-                        Log.d(TAG, "User was ready to proceed to next round")
-                        gameLogic.nextRound(diceViewModel)
-                        startNewRound()
-                    }} else {
-                        Log.d(TAG, "Category was not already selected, trying to...")
-                        lockUserToCategory()
-                    }}
+                0 -> {calculatingPhase()}
 
                 1 -> {nextPhase()
                     throwButton.setText(R.string.btn_select)}
@@ -111,6 +102,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun calculatingPhase() {
+        // Check if category has been chosen
+        if (gameLogic.categorySelected()) {
+            // Check selection
+            if (gameLogic.checkIfValidSelection(diceViewModel)) {
+                // If the selection was valid. Try to add points
+                if (tryGettingPoints()){
+                    // Message user about result
+                    messageUserAboutSelection(true)
+                } else {
+                    // If no points were added, continue to next round
+                    startNewRound()
+                }
+            } else {
+                // Message user about result
+                messageUserAboutSelection(false)
+            }
+        } else {
+            // Lock user to a category if none has been chosen
+            lockUserToCategory()
+        }
+    }
+
     // Lock user to the currently chosen category. Returns true if possible
     private fun lockUserToCategory(): Boolean {
         val category = categorySpinner.selectedItem as String
@@ -130,18 +144,10 @@ class MainActivity : AppCompatActivity() {
     // Try to get points using the currently selected spinner and dice, returns true if user tries to add points
     private fun tryGettingPoints(): Boolean {
 
-        val valid = gameLogic.runCountPhase(diceViewModel)
+        val pointsAdded = gameLogic.runCountPhase(diceViewModel)
+        updateDiceButtonImages()
 
-        // Message user about result
-        messageUserAboutSelection(valid)
-
-        // Dice selection was valid, mark the dice as used.
-        if(valid) {
-            diceViewModel.useLockedDice()
-            diceViewModel.clearLockedDice()
-            updateDiceButtonImages()
-        }
-        return !valid
+        return pointsAdded
     }
 
     // Message user on whether the selection was valid or not
@@ -159,6 +165,7 @@ class MainActivity : AppCompatActivity() {
     private fun startNewGame() {
         gameLogic.newGame(diceViewModel)
         updateDiceButtonImages()
+        updateThrowsLeft(diceViewModel.getThrowsLeft())
     }
 
     // Start a new round
@@ -250,10 +257,9 @@ class MainActivity : AppCompatActivity() {
 
     // Update the text showing how many throws are left
     private fun updateThrowsLeft(throwsLeft: Int) {
-        when(throwsLeft) {
-            2 -> throwCountText.setText(R.string.tv_throws_left_2)
-            1 -> throwCountText.setText(R.string.tv_throws_left_1)
-            else -> throwCountText.setText(R.string.tv_throws_left_0)
-        }
+        Log.d(TAG, "Throws left $throwsLeft")
+        var str: String = resources.getString(R.string.tv_throws_left)
+        str += throwsLeft.toString()
+        throwCountText.text = str
     }
 }

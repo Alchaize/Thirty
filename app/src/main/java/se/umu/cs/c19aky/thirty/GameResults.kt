@@ -32,7 +32,7 @@ class GameResults : AppCompatActivity() {
 
         Log.d(TAG, "Getting stored categories and values")
         values = intent.getIntegerArrayListExtra(EXTRA_DICE_VALUES) as ArrayList<Int>
-        pointSum = intent.getIntExtra(EXTRA_POINT_SUM, 0) as Int
+        pointSum = intent.getIntExtra(EXTRA_POINT_SUM, 0)
 
         val categories: Array<String> = resources.getStringArray(R.array.categories_array)
 

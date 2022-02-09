@@ -55,7 +55,7 @@ class GameLogic {
         diceViewModel.throwDice()
         diceViewModel.resetThrows()
 
-        pointCalculator.unselectCategory()
+        pointCalculator = PointCalculator()
     }
 
     // Go to next round
@@ -67,6 +67,8 @@ class GameLogic {
         diceViewModel.clearUsedDice()
         diceViewModel.throwDice()
         diceViewModel.resetThrows()
+
+        pointCalculator.unselectCategory()
     }
 
     fun nextPhase(diceViewModel: DiceViewModel) {
@@ -81,7 +83,11 @@ class GameLogic {
     }
 
     fun checkIfValidSelection(diceViewModel: DiceViewModel): Boolean {
-        return true
+        return if (diceViewModel.getLockedDiceValues().size == 0) {
+            true
+        } else {
+            pointCalculator.checkIfValidSelection(diceViewModel.getLockedDiceValues())
+        }
     }
 
     // Get points from selection, returns true points were added
@@ -105,6 +111,10 @@ class GameLogic {
         }
         // Add points
         pointCalculator.addPoints(sum)
+
+        diceViewModel.useLockedDice()
+        diceViewModel.clearLockedDice()
+
         return true
     }
 

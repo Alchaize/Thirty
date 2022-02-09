@@ -7,9 +7,7 @@
     <string name="btn_save">Add</string>
     <string name="btn_done">Done</string>
 
-    <string name="tv_throws_left_2">Throws left: 2</string>
-    <string name="tv_throws_left_1">Throws left: 1</string>
-    <string name="tv_throws_left_0">Throws left: 0</string>
+    <string name="tv_throws_left">Throws left: </string>
 
     <string name="tv_categories_header">Categories</string>
     <string name="tv_points_header">Points</string>

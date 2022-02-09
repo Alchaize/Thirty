@@ -54,6 +54,14 @@ class PointCalculator(numberOfCategories: Int = 9) {
         return false
     }
 
+    fun checkIfValidSelection(values: ArrayList<Int>): Boolean {
+        return if (selectedCategory == "Low") {
+            true
+        } else {
+            values.sum() == selectedCategory.toInt()
+        }
+    }
+
     // Calculate points using current category
     fun calculatePoints(valuesLow: ArrayList<Int>, values: ArrayList<Int>): Int {
         val sum = values.sum()
