@@ -43,12 +43,12 @@ class PointCalculator(numberOfCategories: Int = 9) {
 
     // Restore points, categories and selected category
     fun restoreCategories(savedInstanceState: Bundle) {
+        categories.clear()
         val points: ArrayList<Int> = savedInstanceState.getIntegerArrayList(KEY_POINTS) as ArrayList<Int>
         val categories: ArrayList<String> = savedInstanceState.getStringArrayList(KEY_CATEGORIES) as ArrayList<String>
 
         for (x in 0 until categories.size) {
             this.categories.add(Category(categories[x], points[x]))
-            Log.d(TAG, "Added ${categories[x]} with ${points[x]}")
         }
         this.selectedCategory = savedInstanceState.getInt(KEY_SELECTED)
     }
