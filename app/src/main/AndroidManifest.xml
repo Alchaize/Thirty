@@ -13,9 +13,6 @@
             android:name=".GameResults"
             android:exported="false" />
         <activity
-            android:name=".PointCount"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
