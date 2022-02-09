@@ -1,7 +1,9 @@
-package se.umu.cs.c19aky.thirty
+package se.umu.cs.c19aky.thirty.controller
 
 import android.os.Bundle
 import android.util.Log
+import se.umu.cs.c19aky.thirty.model.DiceViewModel
+import se.umu.cs.c19aky.thirty.model.PointCalculator
 
 private const val MAX_ROUNDS = 2
 

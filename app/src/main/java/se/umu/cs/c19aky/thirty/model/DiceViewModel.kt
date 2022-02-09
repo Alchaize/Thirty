@@ -1,6 +1,7 @@
-package se.umu.cs.c19aky.thirty
+package se.umu.cs.c19aky.thirty.model
 
 import androidx.lifecycle.ViewModel
+import se.umu.cs.c19aky.thirty.model.Die
 import kotlin.random.Random
 
 private const val TAG = "DiceViewModel"

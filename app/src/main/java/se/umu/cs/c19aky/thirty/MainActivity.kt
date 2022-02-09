@@ -7,6 +7,8 @@ import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import se.umu.cs.c19aky.thirty.controller.GameLogic
+import se.umu.cs.c19aky.thirty.model.DiceViewModel
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_POINT_SUM
 

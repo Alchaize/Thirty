@@ -1,7 +1,7 @@
-package se.umu.cs.c19aky.thirty
+package se.umu.cs.c19aky.thirty.model
 
 import android.os.Bundle
-import android.util.Log
+import se.umu.cs.c19aky.thirty.model.Category
 
 private const val TAG = "PointCalculator"
 

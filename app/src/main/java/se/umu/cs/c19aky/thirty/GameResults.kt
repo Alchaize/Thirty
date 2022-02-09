@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
+import se.umu.cs.c19aky.thirty.R
 
 private const val TAG = "GameResults"
 
