@@ -124,6 +124,7 @@ class DiceViewModel : ViewModel() {
         return usedDiceValues
     }
 
+    // Get all dice that are unused
     fun getAllUnusedDiceValues() : ArrayList<Int> {
         val usedDiceValues = ArrayList<Int>()
         for (die in diceList) {
@@ -134,12 +135,14 @@ class DiceViewModel : ViewModel() {
         return usedDiceValues
     }
 
+    // Make all dice unused
     fun clearUsedDice() {
         for (die in diceList) {
             die.used = false
         }
     }
 
+    // Use every locked die
     fun useLockedDice() {
         for (die in diceList) {
             if (die.locked) {
