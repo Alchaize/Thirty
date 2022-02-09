@@ -162,6 +162,7 @@ class MainActivity : AppCompatActivity() {
         gameLogic.newGame(diceViewModel)
         updateDiceButtonImages()
         updateThrowsLeft(diceViewModel.getThrowsLeft())
+        throwButton.setText(R.string.btn_throw)
     }
 
     // Start a new round
