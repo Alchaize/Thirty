@@ -108,9 +108,10 @@ class MainActivity : AppCompatActivity() {
             // Check selection
             if (gameLogic.checkIfValidSelection(diceViewModel)) {
                 // If the selection was valid. Try to add points
-                if (tryGettingPoints()){
+                if (gameLogic.runCountPhase(diceViewModel)){
                     // Message user about result
                     messageUserAboutSelection(true)
+                    updateDiceButtonImages()
                 } else {
                     // If no points were added, continue to next round
                     startNewRound()
@@ -139,15 +140,6 @@ class MainActivity : AppCompatActivity() {
             toast.show()
             false
         }
-    }
-
-    // Try to get points using the currently selected spinner and dice, returns true if user tries to add points
-    private fun tryGettingPoints(): Boolean {
-
-        val pointsAdded = gameLogic.runCountPhase(diceViewModel)
-        updateDiceButtonImages()
-
-        return pointsAdded
     }
 
     // Message user on whether the selection was valid or not
