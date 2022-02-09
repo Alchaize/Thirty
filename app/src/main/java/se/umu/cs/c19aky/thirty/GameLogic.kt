@@ -33,14 +33,17 @@ class GameLogic {
         pointCalculator.restoreCategories(savedInstanceState)
     }
 
+    // Get the points in a list
     fun getPoints(): ArrayList<Int> {
         return pointCalculator.getAllPoints()
     }
 
+    // Get the total points
     fun getTotalPoints(): Int {
         return pointCalculator.getTotalPoints()
     }
 
+    // Check if game is done
     fun isGameDone(): Boolean {
         return round >= MAX_ROUNDS
     }
@@ -70,6 +73,7 @@ class GameLogic {
         pointCalculator.unselectCategory()
     }
 
+    // Go to next phase
     fun nextPhase(diceViewModel: DiceViewModel) {
         diceViewModel.throwDice()
         if (diceViewModel.getThrowsLeft() == 0) {
@@ -77,10 +81,12 @@ class GameLogic {
         }
     }
 
+    // Get if it is the count phase
     fun getCountPhase(): Boolean {
         return countPhase
     }
 
+    // Check if currently selected dice are valid
     fun checkIfValidSelection(diceViewModel: DiceViewModel): Boolean {
         return if (diceViewModel.getLockedDiceValues().size == 0) {
             true
@@ -92,7 +98,7 @@ class GameLogic {
     // Get points from selection, returns true points were added
     fun runCountPhase(diceViewModel: DiceViewModel): Boolean {
 
-        var sum: Int
+        val sum: Int
 
         // Split into whether user chose any dice or not
         if (diceViewModel.getLockedDiceValues().size != 0) {
@@ -117,13 +123,16 @@ class GameLogic {
         diceViewModel.useLockedDice()
         diceViewModel.clearLockedDice()
 
+        // Points were added, so return true
         return true
     }
 
+    // Select a category
     fun selectCategory(category: String): Boolean {
         return pointCalculator.selectCategory(category)
     }
 
+    // Check if a category has been selected
     fun categorySelected(): Boolean {
         return pointCalculator.checkIfCategoryIsChosen()
     }
