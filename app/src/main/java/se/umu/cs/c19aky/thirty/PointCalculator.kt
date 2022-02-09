@@ -85,11 +85,11 @@ class PointCalculator(numberOfCategories: Int = 9) {
     }
 
     // Calculate points using current category
-    fun calculatePoints(valuesLow: ArrayList<Int>, values: ArrayList<Int>): Int {
-        val sum = values.sum()
+    fun calculatePoints(values: ArrayList<Int>): Int {
         return if (categories[selectedCategory].categoryName == "Low") {
-            calculatePointsLow(valuesLow)
+            calculatePointsLow(values)
         } else {
+            val sum = values.sum()
             if (sum == categories[selectedCategory].categoryName.toInt()) {
                 sum
             } else {

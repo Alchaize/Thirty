@@ -89,15 +89,17 @@ class GameLogic {
     // Get points from selection, returns true points were added
     fun runCountPhase(diceViewModel: DiceViewModel): Boolean {
 
-        val sum = pointCalculator.calculatePoints(diceViewModel.getAllUnusedDiceValues(), diceViewModel.getLockedDiceValues())
+        var sum: Int
 
         // Split into whether user chose any dice or not
         if (diceViewModel.getLockedDiceValues().size != 0) {
+            sum = pointCalculator.calculatePoints(diceViewModel.getLockedDiceValues())
             // Check if combination didn't work
             if (sum == -1) {
                 return false
             }
         } else {
+            sum = pointCalculator.calculatePoints(diceViewModel.getAllUnusedDiceValues())
             // If no dice were locked, but a sum was still found that means the category "Low" was used
             if (sum == -1) {
                 return false
