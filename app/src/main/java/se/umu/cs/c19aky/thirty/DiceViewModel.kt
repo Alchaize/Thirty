@@ -6,16 +6,20 @@ import kotlin.random.Random
 private const val TAG = "DiceViewModel"
 private const val MAX_THROWS = 2
 
+
+/*
+* Class for keeping track of the dice, it's a ViewModel mostly because I wanted to try using one.
+* */
 class DiceViewModel : ViewModel() {
 
     private var throwsLeft = MAX_THROWS
     private val diceList = listOf(
-        Die(1, false, used = false),
-        Die( 1, false, used = false),
-        Die( 1, false, used = false),
-        Die( 1, false, used = false),
-        Die( 1, false, used = false),
-        Die(1, false, used = false),
+        Die(1, locked = false, used = false),
+        Die( 1, locked = false, used = false),
+        Die( 1, locked = false, used = false),
+        Die( 1, locked = false, used = false),
+        Die( 1, locked = false, used = false),
+        Die(1, locked = false, used = false),
     )
 
     // Get the amount of throws left
@@ -109,6 +113,7 @@ class DiceViewModel : ViewModel() {
         }
     }
 
+    // Get all dice that are used
     fun getAllUsedDiceValues() : ArrayList<Int> {
         val usedDiceValues = ArrayList<Int>()
         for (die in diceList) {
