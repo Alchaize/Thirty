@@ -5,7 +5,7 @@ import android.util.Log
 import se.umu.cs.c19aky.thirty.model.DiceViewModel
 import se.umu.cs.c19aky.thirty.model.PointCalculator
 
-private const val MAX_ROUNDS = 2
+private const val MAX_ROUNDS = 10
 
 private const val STATE_COUNT_PHASE = "countPhase"
 private const val STATE_ROUND_COUNTER = "currentRound"
