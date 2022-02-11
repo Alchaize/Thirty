@@ -183,11 +183,4 @@ class DiceViewModel : ViewModel() {
             diceList[x].used = array?.get(x) == true
         }
     }
-
-    companion object {
-        private const val STATE_THROWS = "throwsLeft"
-        private const val STATE_DICE_VALUES = "diceValues"
-        private const val STATE_DICE_LOCKED = "diceLocked"
-        private const val STATE_DICE_USED = "diceUsed"
-    }
 }

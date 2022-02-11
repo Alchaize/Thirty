@@ -16,9 +16,9 @@ private const val TAG = "MainActivity"
 
 private const val STATE_THROWS = "throwsLeft"
 private const val STATE_DICE_VALUES = "diceValues"
-
 private const val STATE_DICE_LOCKED = "diceLocked"
 private const val STATE_DICE_USED = "diceUsed"
+private const val STATE_SPINNER = "spinnerCategory"
 
 /* Main activity of app */
 class MainActivity : AppCompatActivity() {
@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
         outState.putBooleanArray(STATE_DICE_LOCKED, diceViewModel.getDiceLockedStates())
         outState.putBooleanArray(STATE_DICE_USED, diceViewModel.getDiceUsedStates())
+        outState.putInt(STATE_SPINNER, categorySpinner.selectedItemPosition)
         gameLogic.saveInstance(outState)
         super.onSaveInstanceState(outState)
     }
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         updateThrowsLeft(diceViewModel.getThrowsLeft())
         gameLogic.restoreInstance(savedInstanceState)
         updateDiceButtonImages()
+        categorySpinner.setSelection(savedInstanceState.getInt(STATE_SPINNER))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,13 +105,12 @@ class MainActivity : AppCompatActivity() {
             categorySpinner.adapter = adapter
         }
 
-        // Select the first item in the spinner
-        categorySpinner.setSelection(0)
-
         // If instance has been saved, restore that data
         if (savedInstanceState == null) {
             Log.d(TAG, "No saved instance, starting new game")
             startNewGame()
+            // Select the first item in the spinner
+            categorySpinner.setSelection(0)
         }
     }
 
