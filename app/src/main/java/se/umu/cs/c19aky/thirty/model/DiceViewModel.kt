@@ -152,8 +152,42 @@ class DiceViewModel : ViewModel() {
         }
     }
 
+    // Get dice locked states
+    fun getDiceLockedStates(): BooleanArray? {
+        val booleanArray: BooleanArray? = BooleanArray(diceList.size)
+        for (x in diceList.indices) {
+            booleanArray?.set(x, diceList[x].locked)
+        }
+        return booleanArray
+    }
+
+    // Get dice locked states
+    fun getDiceUsedStates(): BooleanArray? {
+        val booleanArray: BooleanArray? = BooleanArray(diceList.size)
+        for (x in diceList.indices) {
+            booleanArray?.set(x, diceList[x].used)
+        }
+        return booleanArray
+    }
+
+    // Set dice locked states
+    fun setDiceLockedStates(array: BooleanArray?) {
+        for (x in diceList.indices) {
+            diceList[x].locked = array?.get(x) == true
+        }
+    }
+
+    // Set dice locked states
+    fun setDiceUsedStates(array: BooleanArray?) {
+        for (x in diceList.indices) {
+            diceList[x].used = array?.get(x) == true
+        }
+    }
+
     companion object {
         private const val STATE_THROWS = "throwsLeft"
         private const val STATE_DICE_VALUES = "diceValues"
+        private const val STATE_DICE_LOCKED = "diceLocked"
+        private const val STATE_DICE_USED = "diceUsed"
     }
 }

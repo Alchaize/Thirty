@@ -8,14 +8,17 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import se.umu.cs.c19aky.thirty.model.GameLogic
-import se.umu.cs.c19aky.thirty.model.DiceViewModel
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_POINT_SUM
+import se.umu.cs.c19aky.thirty.model.DiceViewModel
 
 private const val TAG = "MainActivity"
 
 private const val STATE_THROWS = "throwsLeft"
 private const val STATE_DICE_VALUES = "diceValues"
+
+private const val STATE_DICE_LOCKED = "diceLocked"
+private const val STATE_DICE_USED = "diceUsed"
 
 /* Main activity of app */
 class MainActivity : AppCompatActivity() {
@@ -37,16 +40,20 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Saving instance")
         outState.putInt(STATE_THROWS, diceViewModel.getThrowsLeft())
         outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
+        outState.putBooleanArray(STATE_DICE_LOCKED, diceViewModel.getDiceLockedStates())
+        outState.putBooleanArray(STATE_DICE_USED, diceViewModel.getDiceUsedStates())
         gameLogic.saveInstance(outState)
         super.onSaveInstanceState(outState)
     }
 
-    // Explicitly overriding because that's apparently important
+    // Restore instance
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         Log.d(TAG, "Restoring instance")
         diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
         diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
+        diceViewModel.setDiceLockedStates(savedInstanceState.getBooleanArray(STATE_DICE_LOCKED))
+        diceViewModel.setDiceUsedStates(savedInstanceState.getBooleanArray(STATE_DICE_USED))
         updateThrowsLeft(diceViewModel.getThrowsLeft())
         gameLogic.restoreInstance(savedInstanceState)
         updateDiceButtonImages()
