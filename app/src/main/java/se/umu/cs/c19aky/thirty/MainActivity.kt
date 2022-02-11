@@ -19,6 +19,7 @@ private const val STATE_DICE_VALUES = "diceValues"
 private const val STATE_DICE_LOCKED = "diceLocked"
 private const val STATE_DICE_USED = "diceUsed"
 private const val STATE_SPINNER = "spinnerCategory"
+private const val STATE_BUTTON = "buttonState"
 
 /* Main activity of app */
 class MainActivity : AppCompatActivity() {
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         outState.putBooleanArray(STATE_DICE_LOCKED, diceViewModel.getDiceLockedStates())
         outState.putBooleanArray(STATE_DICE_USED, diceViewModel.getDiceUsedStates())
         outState.putInt(STATE_SPINNER, categorySpinner.selectedItemPosition)
+        outState.putString(STATE_BUTTON, throwButton.text.toString())
         gameLogic.saveInstance(outState)
         super.onSaveInstanceState(outState)
     }
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         gameLogic.restoreInstance(savedInstanceState)
         updateDiceButtonImages()
         categorySpinner.setSelection(savedInstanceState.getInt(STATE_SPINNER))
+        throwButton.text = savedInstanceState.getString(STATE_BUTTON)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
