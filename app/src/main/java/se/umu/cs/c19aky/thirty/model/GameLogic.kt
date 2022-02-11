@@ -1,4 +1,4 @@
-package se.umu.cs.c19aky.thirty.controller
+package se.umu.cs.c19aky.thirty.model
 
 import android.os.Bundle
 import android.util.Log
