@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
-import se.umu.cs.c19aky.thirty.controller.GameLogic
+import se.umu.cs.c19aky.thirty.model.GameLogic
 import se.umu.cs.c19aky.thirty.model.DiceViewModel
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_DICE_VALUES
 import se.umu.cs.c19aky.thirty.GameResults.Companion.EXTRA_POINT_SUM
@@ -39,6 +39,17 @@ class MainActivity : AppCompatActivity() {
         outState.putIntegerArrayList(STATE_DICE_VALUES, diceViewModel.getDiceValues())
         gameLogic.saveInstance(outState)
         super.onSaveInstanceState(outState)
+    }
+
+    // Explicitly overriding because that's apparently important
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Log.d(TAG, "Restoring instance")
+        diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
+        diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
+        updateThrowsLeft(diceViewModel.getThrowsLeft())
+        gameLogic.restoreInstance(savedInstanceState)
+        updateDiceButtonImages()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,14 +100,7 @@ class MainActivity : AppCompatActivity() {
         categorySpinner.setSelection(0)
 
         // If instance has been saved, restore that data
-        if (savedInstanceState != null) {
-            Log.d(TAG, "Restoring instance")
-            diceViewModel.setThrowsLeft(savedInstanceState.getInt(STATE_THROWS))
-            diceViewModel.setDiceValues(savedInstanceState.getIntegerArrayList(STATE_DICE_VALUES) as ArrayList<Int>)
-            updateThrowsLeft(diceViewModel.getThrowsLeft())
-            gameLogic.restoreInstance(savedInstanceState)
-            updateDiceButtonImages()
-        } else {
+        if (savedInstanceState == null) {
             Log.d(TAG, "No saved instance, starting new game")
             startNewGame()
         }
@@ -201,40 +205,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateButtonImage(button : ImageButton, index : Int) {
 
         if (!diceViewModel.getDieLocked(index)) {
-            val image = when(diceViewModel.getDieValue(index)) {
-                1 -> R.drawable.white1
-                2 -> R.drawable.white2
-                3 -> R.drawable.white3
-                4 -> R.drawable.white4
-                5 -> R.drawable.white5
-                6 -> R.drawable.white6
-                else -> throw Exception("Die value outside of 1-6")
-            }
+            val image = whiteDieImages(index)
             button.setImageResource(image)
         } else {
             // Use different dice depending on which state the player is in
             val image = if (!gameLogic.getCountPhase()) {
                 // Grey dice for the normal phases
-                when(diceViewModel.getDieValue(index)) {
-                    1 -> R.drawable.grey1
-                    2 -> R.drawable.grey2
-                    3 -> R.drawable.grey3
-                    4 -> R.drawable.grey4
-                    5 -> R.drawable.grey5
-                    6 -> R.drawable.grey6
-                    else -> throw Exception("Die value outside of 1-6")
-                }
+                greyDieImages(index)
             } else {
-                // Red dice for counting phase
-                when(diceViewModel.getDieValue(index)) {
-                    1 -> R.drawable.red1
-                    2 -> R.drawable.red2
-                    3 -> R.drawable.red3
-                    4 -> R.drawable.red4
-                    5 -> R.drawable.red5
-                    6 -> R.drawable.red6
-                    else -> throw Exception("Die value outside of 1-6")
-                }
+                // Red dice for count phase
+                redDieImages(index)
             }
             button.setImageResource(image)
         }
@@ -258,5 +238,44 @@ class MainActivity : AppCompatActivity() {
         var str: String = resources.getString(R.string.tv_throws_left)
         str += " $throwsLeft"
         throwCountText.text = str
+    }
+
+    // Get a die image in grey
+    private fun greyDieImages(dieIndex: Int): Int {
+        return when(diceViewModel.getDieValue(dieIndex)) {
+            1 -> R.drawable.grey1
+            2 -> R.drawable.grey2
+            3 -> R.drawable.grey3
+            4 -> R.drawable.grey4
+            5 -> R.drawable.grey5
+            6 -> R.drawable.grey6
+            else -> throw Exception("Die value outside of 1-6")
+        }
+    }
+
+    // Get a die image in white
+    private fun whiteDieImages(dieIndex: Int): Int {
+        return when(diceViewModel.getDieValue(dieIndex)) {
+            1 -> R.drawable.white1
+            2 -> R.drawable.white2
+            3 -> R.drawable.white3
+            4 -> R.drawable.white4
+            5 -> R.drawable.white5
+            6 -> R.drawable.white6
+            else -> throw Exception("Die value outside of 1-6")
+        }
+    }
+
+    // Get a die image in red
+    private fun redDieImages(dieIndex: Int): Int {
+        return when(diceViewModel.getDieValue(dieIndex)) {
+            1 -> R.drawable.red1
+            2 -> R.drawable.red2
+            3 -> R.drawable.red3
+            4 -> R.drawable.red4
+            5 -> R.drawable.red5
+            6 -> R.drawable.red6
+            else -> throw Exception("Die value outside of 1-6")
+        }
     }
 }
